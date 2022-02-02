@@ -1,0 +1,213 @@
+﻿<Page x:Class="Egate_Payroll.Pages.history_payroll"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Egate_Payroll.Pages"
+      xmlns:templates="clr-namespace:Egate_Payroll.Templates"
+      xmlns:extTools="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+      xmlns:customs="clr-namespace:CustomControls;assembly=CustomControls"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="history_payroll"
+      Loaded="Page_Loaded">
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="620"/>
+            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <customs:PopupModal x:Name="EditRegularHours_popup" IsOpen="False" StaysOpen="False" AllowsTransparency="True" PlacementTarget="{Binding ElementName=editBtn}" Placement="Bottom">
+            <Grid Background="White">
+                <Grid.Effect>
+                    <DropShadowEffect/>
+                </Grid.Effect>
+                <StackPanel Orientation="Horizontal" Margin="20">
+                    <TextBlock Text="Regular Hours:"/>
+                    <extTools:DecimalUpDown x:Name="EditRegularHours_value" ShowButtonSpinner="False" FormatString="N0" Width="60" Margin="5,0,0,0"/>
+                    <Button Style="{StaticResource BorderlessButton}" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-check}"
+                            Foreground="DarkGreen" Command="{Binding ElementName=EditRegularHours_popup, Path=SubmitCommand}" Margin="5,0,5,0"/>
+                    <Button Style="{StaticResource BorderlessButton}" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-times}"
+                            Foreground="DarkRed" Command="{Binding ElementName=EditRegularHours_popup, Path=CloseCommand}" Margin="5,0,5,0"/>
+                </StackPanel>
+                <Border BorderBrush="Gray" BorderThickness="1"/>
+            </Grid>
+        </customs:PopupModal>
+        
+        <Grid Grid.Column="0">
+            <GroupBox Header="Cutoff List">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="83"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0">
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="50,0,0,0">
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="{Binding CurrentPeriod.RegularHours,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Page}}"
+                                       TextAlignment="Center" FontSize="24"/>
+                                    <TextBlock Text="Regular Hours" FontWeight="Bold"/>
+                                </StackPanel>
+                                <Button x:Name="editBtn" Click="EditRegularHours_btn_Click"
+                                        FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-edit}" Style="{StaticResource BorderlessButton}"
+                                        Foreground="Navy" Margin="5,0,0,0" ToolTip="Edit regular hours" VerticalAlignment="Bottom"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,50,0">
+                            <TextBlock Text="{Binding CurrentPeriod.EmployeeCount,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Page}}"
+                                       TextAlignment="Center" FontSize="24"/>
+                            <TextBlock Text="Total Employees" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Grid>
+                    
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding ItemCutoffList,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}">
+                        <DataGrid.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCell.Style.Default}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="Background" Value="#ddcbf5"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.CellStyle>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource DataGridRow.Style.Default}">
+                                <EventSetter Event="Selected" Handler="CutoffList_Selected"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="Background" Value="#ddcbf5"/>
+                                        <Setter Property="Foreground" Value="white"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Center}">
+                                        <Setter Property="Foreground" Value="Gray"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Select">
+                                <DataGridTemplateColumn.HeaderStyle>
+                                    <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                    </Style>
+                                </DataGridTemplateColumn.HeaderStyle>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Click="PeriodSelected_chk_Click"
+                                                  VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                  Cursor="Hand">
+                                            <CheckBox.Style>
+                                                <Style TargetType="{x:Type CheckBox}">
+                                                    <Setter Property="IsHitTestVisible" Value="True"/>
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsChecked" Value="True">
+                                                            <Setter Property="IsHitTestVisible" Value="False"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </CheckBox.Style>
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Saved" Binding="{Binding ImportTime, StringFormat=yyyy-MM-dd hh:mm:ss tt}"
+                                            SortMemberPath="ImportTime" SortDirection="Descending">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                        <Setter Property="Foreground" Value="Gray"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Period" SortMemberPath="StartDate">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock VerticalAlignment="Center" TextAlignment="Center" 
+                                               Margin="{StaticResource DataGridTextCell.Margin}">
+                                        <Run Text="{Binding StartDate,StringFormat=yyyy-MM-dd}" Foreground="Red" FontWeight="Bold"/>
+                                        <Run Text="-" Foreground="Gray"/>
+                                        <Run Text="{Binding EndDate,StringFormat=yyyy-MM-dd}" Foreground="Purple" FontWeight="Bold"/>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="DELETE" Click="DeleteCutoff_btn_Click"
+                                                Background="Red" Foreground="White" BorderThickness="0"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Days" Binding="{Binding Days}">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                        <Setter Property="Foreground" Value="Navy"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Regular Hours">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <TextBlock Text="{Binding RegularHours}" TextAlignment="Right" FontWeight="Bold"
+                                                   Margin="{StaticResource DataGridTextCell.Margin}"/>
+                                            <TextBlock FontFamily="{StaticResource fontawesome-solid}" Text="{StaticResource fa-exclamation-triangle}"
+                                                       ToolTip="Regular Hours is required to compute for payroll." Visibility="{Binding RegularHours, Converter={StaticResource VisibilityCollapsedValueInverseConverter}}"
+                                                       Foreground="red" TextAlignment="Right" VerticalAlignment="Center" 
+                                                       FontSize="14" Margin="{StaticResource DataGridTextCell.Margin}">
+                                            </TextBlock>
+                                        </Grid>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Employees" Binding="{Binding EmployeeCount}">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <Grid Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <DockPanel>
+                    <!-- filters -->
+                    <GroupBox Header="Filters" VerticalAlignment="Top" HorizontalAlignment="Left"
+                                      DataContext="{Binding FilterDetails, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}">
+                        <WrapPanel Orientation="Horizontal" Margin="{StaticResource Filters.GroupBox.Margin}">
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                                <TextBlock Text="Department"/>
+                                <ComboBox Width="150" ItemsSource="{Binding DepartmentList}" SelectedItem="{Binding FilterDepartment}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Employee Name"/>
+                                <customs:SearchableComboBox Width="150" ItemsSource="{Binding NameList}" SelectedItem="{Binding FilterName}"/>
+                            </StackPanel>
+                        </WrapPanel>
+                    </GroupBox>
+                </DockPanel>
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <templates:details ItemListSource="{Binding ItemDetailsList, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

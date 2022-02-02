@@ -1,0 +1,9 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:CustomMonthlyCalendar">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/CustomMonthlyCalendar;component/Styles/MonthlyCalendar.xaml"/>
+        <ResourceDictionary Source="/CustomMonthlyCalendar;component/Styles/MonthlyCalendarDayButton.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+</ResourceDictionary>

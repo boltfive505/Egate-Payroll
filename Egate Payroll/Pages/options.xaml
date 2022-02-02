@@ -1,0 +1,61 @@
+﻿<Page x:Class="Egate_Payroll.Pages.options"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Egate_Payroll.Pages"
+      xmlns:templates="clr-namespace:Egate_Payroll.Templates"
+      xmlns:contributionTables="clr-namespace:Egate_Payroll.Templates.Contribution_Tables"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="options"
+      Loaded="Page_Loaded">
+    <Grid Background="White">
+        <TabControl TabStripPlacement="Left" HorizontalAlignment="Stretch">
+            <TabItem Style="{StaticResource TabItem.Header.Left}" Padding="{StaticResource TabItem.Main.Padding}">
+                <TabItem.Header>
+                    <TextBlock Text="Holiday Calendar" FontWeight="Bold"/>
+                </TabItem.Header>
+                <templates:holiday_calendar Height="700" Width="1000" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="{StaticResource Page.Main.Margin}"/>
+            </TabItem>
+            <TabItem Style="{StaticResource TabItem.Header.Left}" Padding="{StaticResource TabItem.Main.Padding}" IsHitTestVisible="False">
+                <TabItem.Header>
+                    <TextBlock FontWeight="Bold" Text="Contribution Tables"/>
+                </TabItem.Header>
+            </TabItem>
+            <TabItem Header="SSS" Style="{StaticResource TabItem.Header.Left}" Padding="{StaticResource TabItem.Sub.Padding}" Background="{StaticResource TabItem.Sub.Background}">
+                <contributionTables:sss_table Margin="{StaticResource Page.Main.Margin}"
+                                              Width="570" HorizontalAlignment="Left"/>
+            </TabItem>
+            <TabItem Header="Philhealth" Style="{StaticResource TabItem.Header.Left}" Padding="{StaticResource TabItem.Sub.Padding}" Background="{StaticResource TabItem.Sub.Background}">
+                <contributionTables:philhealth_table Margin="{StaticResource Page.Main.Margin}"
+                                                     Width="570" HorizontalAlignment="Left"/>
+            </TabItem>
+            <TabItem Header="Pag-Ibig" Style="{StaticResource TabItem.Header.Left}" Padding="{StaticResource TabItem.Sub.Padding}" Background="{StaticResource TabItem.Sub.Background}">
+                <contributionTables:pagibig_table Margin="{StaticResource Page.Main.Margin}"
+                                                  Width="570" HorizontalAlignment="Left"/>
+            </TabItem>
+            <TabItem Header="Withholding Tax" Style="{StaticResource TabItem.Header.Left}" Padding="{StaticResource TabItem.Sub.Padding}" Background="{StaticResource TabItem.Sub.Background}">
+                <contributionTables:withholding_tax_table Margin="{StaticResource Page.Main.Margin}"
+                                                          Width="570" HorizontalAlignment="Left"/>
+            </TabItem>
+            <TabItem Style="{StaticResource TabItem.Header.Left}" Padding="{StaticResource TabItem.Main.Padding}">
+                <TabItem.Header>
+                    <TextBlock Text="Tax Form Category" FontWeight="Bold"/>
+                </TabItem.Header>
+                <templates:tax_form_category Margin="{StaticResource Page.Main.Margin}"/>
+            </TabItem>
+            <TabItem Style="{StaticResource TabItem.Header.Left}" Padding="{StaticResource TabItem.Main.Padding}">
+                <TabItem.Header>
+                    <TextBlock Text="Tax Company List" FontWeight="Bold"/>
+                </TabItem.Header>
+                <Frame Margin="{StaticResource Page.Main.Margin}">
+                    <Frame.Content>
+                        <local:tax_company_list/>
+                    </Frame.Content>
+                </Frame>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Page>

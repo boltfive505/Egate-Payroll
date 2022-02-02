@@ -1,0 +1,38 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Egate_Payroll.Styles"
+                    xmlns:converters="clr-namespace:Egate_Payroll.Converters">
+
+    <converters:MultiValueMainTitleConverter x:Key="MultiValueMainTitleConverter"/>
+    <converters:ObjectToBoolConverter x:Key="ObjectToBoolConverter"/>
+    <converters:MultiValueEqualityConverter x:Key="MultiValueEqualityConverter"/>
+    <converters:TimeSpanTotalHoursDisplayConverter x:Key="TimeSpanTotalHoursDisplayConverter"/>
+    <converters:MultiValueStringConcatenateConverter x:Key="MultiValueStringConcatenateConverter"/>
+    <converters:MonthNameConverter x:Key="MonthNameConverter"/>
+    <converters:OrdinalStringConverter x:Key="OrdinalStringConverter"/>
+    <converters:TotalHoursConverter x:Key="TotalHoursConverter"/>
+    <converters:PercentConverter x:Key="PercentConverter"/>
+    <converters:AdjustedHoursModeTextConverter x:Key="AdjustedHoursModeTextConverter"/>
+
+    <converters:ValueConverterGroup x:Key="VisibilityValueConverter">
+        <converters:ObjectToBoolConverter/>
+        <converters:VisibilityFromBoolConverter/>
+    </converters:ValueConverterGroup>
+
+    <converters:ValueConverterGroup x:Key="VisibilityCollapsedValueConverter">
+        <converters:ObjectToBoolConverter/>
+        <converters:VisibilityFromBoolConverter HiddenValue="Collapsed"/>
+    </converters:ValueConverterGroup>
+
+    <converters:ValueConverterGroup x:Key="VisibilityValueInverseConverter">
+        <converters:ObjectToBoolConverter/>
+        <converters:BooleanlnverseConverter/>
+        <converters:VisibilityFromBoolConverter/>
+    </converters:ValueConverterGroup>
+
+    <converters:ValueConverterGroup x:Key="VisibilityCollapsedValueInverseConverter">
+        <converters:ObjectToBoolConverter/>
+        <converters:BooleanlnverseConverter/>
+        <converters:VisibilityFromBoolConverter HiddenValue="Collapsed"/>
+    </converters:ValueConverterGroup>
+</ResourceDictionary>

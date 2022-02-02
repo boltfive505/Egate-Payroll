@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="Egate_Payroll.Templates.Contribution_Tables.sss_edit_bracket"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Egate_Payroll.Templates.Contribution_Tables"
+             xmlns:extTool="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="White">
+        <DockPanel Margin="{StaticResource Filters.GroupBox.Margin}" VerticalAlignment="Top" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="{StaticResource EditBracket.Group.Margin}">
+                <StackPanel Orientation="Vertical"  Margin="{StaticResource EditBracket.Fields.Margin}">
+                    <TextBlock Text="Range of Compensation" HorizontalAlignment="Center"/>
+                    <StackPanel Orientation="Horizontal">
+                        <extTool:DecimalUpDown x:Name="CompensationFromValue" ShowButtonSpinner="False" FormatString="N2" Value="{Binding CompensationFrom,UpdateSourceTrigger=Explicit}" Width="100">
+                            <extTool:DecimalUpDown.Style>
+                                <Style TargetType="{x:Type extTool:DecimalUpDown}">
+                                    <Setter Property="IsEnabled" Value="True"/>
+                                    <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CompensationFrom, Converter={StaticResource ObjectToBoolConverter}}" Value="False">
+                                            <Setter Property="IsEnabled" Value="False"/>
+                                            <Setter Property="ToolTip" Value="Value is set to BELOW"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </extTool:DecimalUpDown.Style>
+                        </extTool:DecimalUpDown>
+                        <TextBlock Text="  -  "/>
+                        <extTool:DecimalUpDown x:Name="CompensationToValue" FormatString="N2" ShowButtonSpinner="False" Value="{Binding CompensationTo,UpdateSourceTrigger=Explicit}" Width="100">
+                            <extTool:DecimalUpDown.Style>
+                                <Style TargetType="{x:Type extTool:DecimalUpDown}">
+                                    <Setter Property="IsEnabled" Value="True"/>
+                                    <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding CompensationTo, Converter={StaticResource ObjectToBoolConverter}}" Value="False">
+                                            <Setter Property="IsEnabled" Value="False"/>
+                                            <Setter Property="ToolTip" Value="Value is set to OVER"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </extTool:DecimalUpDown.Style>
+                        </extTool:DecimalUpDown>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" VerticalAlignment="Top" Margin="{StaticResource EditBracket.Fields.Margin}">
+                    <TextBlock Text="Employee Contribution"/>
+                    <extTool:DecimalUpDown x:Name="EmployeeContributionValue" FormatString="N2" ShowButtonSpinner="False" Value="{Binding EmployeeContribution,UpdateSourceTrigger=Explicit}"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" VerticalAlignment="Top" Margin="{StaticResource EditBracket.Fields.Margin}">
+                    <TextBlock Text="Employer Contribution"/>
+                    <extTool:DecimalUpDown x:Name="EmployerContributionValue" FormatString="N2" ShowButtonSpinner="False" Value="{Binding EmployerContribution,UpdateSourceTrigger=Explicit}"/>
+                </StackPanel>
+            </StackPanel>
+        </DockPanel>
+    </Grid>
+</UserControl>

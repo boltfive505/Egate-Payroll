@@ -1,0 +1,639 @@
+﻿<Page x:Class="Egate_Payroll.Pages.computation_1"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Egate_Payroll.Pages"
+      xmlns:me="clr-namespace:Egate_Payroll"
+      xmlns:sys="clr-namespace:System;assembly=mscorlib"
+      xmlns:templates="clr-namespace:Egate_Payroll.Templates"
+      xmlns:converters="clr-namespace:Egate_Payroll.Converters"
+      xmlns:extTool="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+      xmlns:customs="clr-namespace:CustomControls;assembly=CustomControls"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="settings_payroll"
+      Loaded="Page_Loaded">
+    <Page.Resources>
+        <SolidColorBrush x:Key="Absent.Background" Color="#9cc5ff"/>
+        <SolidColorBrush x:Key="Absent.Foreground" Color="red"/>
+        <SolidColorBrush x:Key="MissingBothTime.Foreground" Color="red"/>
+        <SolidColorBrush x:Key="MissingOneTime.Foreground" Color="Purple"/>
+        <SolidColorBrush x:Key="ComputedTime.Foreground" Color="DarkGreen"/>
+        <SolidColorBrush x:Key="TotalTime.Foreground" Color="Red"/>
+        <converters:MultiValueNumberOperationConverter x:Key="AdjsutedWorkTimeSum" Operation="Add"/>
+        <ObjectDataProvider x:Key="AdjustedHoursModeValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="me:AdjustedHoursMode"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+    </Page.Resources>
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="140"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="350"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- cutoff list -->
+        <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="3">
+            <GroupBox Header="Cutoff List">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="27*"/>
+                        <ColumnDefinition Width="142*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="123"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding ItemCutoffList,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}" Grid.ColumnSpan="2">
+                        <DataGrid.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCell.Style.Default}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="Background" Value="#ddcbf5"/>
+                                        <Setter Property="Foreground" Value="white"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.CellStyle>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource DataGridRow.Style.Default}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="Background" Value="#ddcbf5"/>
+                                        <Setter Property="Foreground" Value="white"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Center}">
+                                        <Setter Property="Foreground" Value="Gray"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Selected">
+                                <DataGridTemplateColumn.HeaderStyle>
+                                    <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                    </Style>
+                                </DataGridTemplateColumn.HeaderStyle>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"
+                                                  VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False"
+                                                  IsEnabled="False"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Period" SortMemberPath="StartDate">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock VerticalAlignment="Center" TextAlignment="Center" 
+                                               Margin="{StaticResource DataGridTextCell.Margin}">
+                                            <Run Text="{Binding StartDate,StringFormat=yyyy-MM-dd}" Foreground="Red" FontWeight="Bold"/>
+                                            <Run Text="-" Foreground="Gray"/>
+                                            <Run Text="{Binding EndDate,StringFormat=yyyy-MM-dd}" Foreground="Purple" FontWeight="Bold"/>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Saved" Binding="{Binding ImportTime, StringFormat=yyyy-MM-dd hh:mm:ss tt}"
+                                            SortMemberPath="ImportTime" SortDirection="Descending">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                        <Setter Property="Foreground" Value="Gray"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <Grid Grid.Row="0" Grid.Column="1" Margin="10,0,0,0">
+            <DockPanel>
+                <!-- filters -->
+                <GroupBox Header="Filters" VerticalAlignment="Top" HorizontalAlignment="Left"
+                          DataContext="{Binding Filters, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}">
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.GroupBox.Margin}">
+                        <WrapPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                                <TextBlock Text="Employee Name"/>
+                                <customs:SearchableComboBox Width="180" ItemsSource="{Binding DetailedNameList}" SelectedValue="{Binding FilterName}"
+                                                            SelectedValuePath="Name" SearchText="Employees_cbox_SearchText">
+                                    <customs:SearchableComboBox.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type local:computation_1+FilterGroup+DetailedName}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding DisplayName}"/>
+                                                <TextBlock Text="{Binding TotalTime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}, StringFormat={} - {0}}"
+                                                           FontWeight="Bold" Visibility="{Binding TotalTime, Converter={StaticResource VisibilityCollapsedValueConverter}}"
+                                                           Foreground="{StaticResource TotalTime.Foreground}"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </customs:SearchableComboBox.ItemTemplate>
+                                </customs:SearchableComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                                <TextBlock Text=""/>
+                                <CheckBox Content="View Manual Input" IsChecked="{Binding FilterManualTimeInput}"
+                                          Style="{StaticResource RightCheckBox}"/>
+                            </StackPanel>
+                            <Button Content="Reset" Click="ResetFilter_btn_Click"
+                                    VerticalAlignment="Bottom" Width="65"/>
+                        </WrapPanel>
+                        <WrapPanel Orientation="Horizontal" Margin="{StaticResource Filters.Vertical.Margin}">
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                                <TextBlock Text="From Date"/>
+                                <extTool:DateTimePicker x:Name="fromDateRange" Width="120" TimePickerVisibility="Collapsed" Format="Custom" FormatString="yyyy-MM-dd"
+                                                        Value="{Binding FilterFromDate, Mode=TwoWay, UpdateSourceTrigger=Explicit}" Minimum="{Binding MinDate}" Maximum="{Binding MaxDate}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                                <TextBlock Text="To Date"/>
+                                <extTool:DateTimePicker x:Name="toDateRange" Width="120" TimePickerVisibility="Collapsed" Format="Custom" FormatString="yyyy-MM-dd"
+                                                        Value="{Binding FilterToDate,Mode=TwoWay,UpdateSourceTrigger=Explicit}" Minimum="{Binding MinDate}" Maximum="{Binding MaxDate}"/>
+                            </StackPanel>
+                            <Button Content="Apply Date Range" Click="ApplyDateRange_btn_Click"
+                                    VerticalAlignment="Bottom" Margin="{StaticResource Filters.Fields.Margin}"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- computation settings -->
+                <GroupBox Header="Shift Settings" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="10,0,0,0"
+                          DataContext="{Binding Settings,RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Page}}">
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.GroupBox.Margin}">
+                        <WrapPanel>
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                                <TextBlock Text="On Duty"/>
+                                <extTool:TimePicker Value="{Binding OnDuty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="100" 
+                                                Format="Custom" FormatString="HH:mm"
+                                                ShowDropDownButton="False" TextAlignment="Left"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                                <TextBlock Text="Off Duty"/>
+                                <extTool:TimePicker Value="{Binding OffDuty, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="100" 
+                                                Format="Custom" FormatString="HH:mm"
+                                                ShowDropDownButton="False" TextAlignment="Left"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                                <Button Content="Apply &amp; Save Computation" Click="ApplyAndSave_btn_Click"
+                                        Background="DarkGreen" Foreground="White" FontWeight="Bold"/>
+                            </StackPanel>
+                        </WrapPanel>
+                        <WrapPanel Margin="{StaticResource Filters.Vertical.Margin}">
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                                <TextBlock Text="OT Offset (minutes)"/>
+                                <extTool:IntegerUpDown Value="{Binding OvertimeOffsetMinutes,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="100"
+                                                   HorizontalAlignment="Left"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                                <TextBlock Text="     "/>
+                                <CheckBox Content="Deduct OT Offset" Style="{StaticResource RightCheckBox}"
+                                      IsChecked="{Binding DeductOvertimeOffset, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </WrapPanel>
+                    </StackPanel>
+                </GroupBox>
+                <Button Content="Export Excel" Click="ExportExcel_btn_Click"
+                        VerticalAlignment="Top" HorizontalAlignment="Left" Margin="20,0,0,0" Background="SkyBlue"/>
+            </DockPanel>
+        </Grid>
+
+        <!-- edit time popup -->
+        <customs:PopupModal x:Name="editTime_popup" AllowsTransparency="True" IsOpen="False" StaysOpen="False" Placement="MousePoint">
+            <Grid Background="White">
+                <Grid.Effect>
+                    <DropShadowEffect/>
+                </Grid.Effect>
+                <DockPanel Margin="15">
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" 
+                                HorizontalAlignment="Right" Margin="0,3,0,0">
+                        <Button Content="Save" Style="{StaticResource LinkButton}"
+                            Command="{Binding SubmitCommand, ElementName=editTime_popup}"/>
+                        <Button Content="Cancel" Style="{StaticResource LinkButton}" Margin="8,0,0,0"
+                            Command="{Binding CloseCommand, ElementName=editTime_popup}"/>
+                    </StackPanel>
+                    <TextBlock Text="Edit Time" VerticalAlignment="Center"/>
+                    <extTool:TimePicker x:Name="editTime_timepicker" 
+                                        Format="Custom" FormatString="HH:mm"
+                                        ShowDropDownButton="False" TextAlignment="Left" 
+                                        Width="100" Margin="8,0,0,0"/>
+                </DockPanel>
+                <Border BorderBrush="Gray" BorderThickness="1"/>
+            </Grid>
+        </customs:PopupModal>
+
+        <!-- adjustment hours popup -->
+        <customs:PopupModal x:Name="adjustmentHours_popup" AllowsTransparency="True" IsOpen="False" StaysOpen="False" Placement="MousePoint">
+            <Grid Background="White" Margin="0,0,15,15">
+                <Grid.Effect>
+                    <DropShadowEffect/>
+                </Grid.Effect>
+                <Grid Margin="15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <!-- adjusted hours field -->
+                    <TextBlock Grid.Column="0" Grid.Row="0" Text="Adjusted Time" Margin="0,0,8,0"/>
+                    <extTool:TimeSpanUpDown Grid.Column="1" Grid.Row="0" x:Name="AdjustmentTimeValue"
+                                        Value="{Binding AdjustmentTime,Mode=TwoWay,UpdateSourceTrigger=Explicit}"
+                                            ShowDays="False" ShowSeconds="False" DisplayDefaultValueOnEmptyText="True"
+                                        Width="80" HorizontalAlignment="Left" TextAlignment="Right"/>
+                    <ListBox Grid.Column="1" Grid.Row="1" BorderThickness="0" x:Name="AdjustmentTimeMode"
+                             ItemsSource="{Binding Source={StaticResource AdjustedHoursModeValues}}"
+                             SelectedItem="{Binding AdjustmentTimeMode,Mode=TwoWay,UpdateSourceTrigger=Explicit}"
+                             Margin="0,0,0,10">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListBoxItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                            <ContentPresenter Margin="0,5,15,5"/>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type me:AdjustedHoursMode}">
+                                <RadioButton IsChecked="{Binding Path=IsSelected, Mode=TwoWay,RelativeSource={RelativeSource AncestorType=ListBoxItem}}">
+                                    <TextBlock Text="{Binding}"/>
+                                </RadioButton>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <!-- notes field -->
+                    <TextBlock Grid.Column="0" Grid.Row="2" Text="Notes"/>
+                    <TextBox Grid.Column="1" Grid.Row="2" x:Name="AdjustmentTimeNotes" Text="{Binding AdjustmentTimeNotes,Mode=TwoWay,UpdateSourceTrigger=Explicit}" TextWrapping="Wrap" Width="200"/>
+                    <!-- buttons -->
+                    <StackPanel Grid.Column="1" Grid.Row="3" Orientation="Horizontal"
+                                HorizontalAlignment="Right" Margin="0,5,0,0">
+                        <Button Content="Save" Style="{StaticResource LinkButton}"
+                            Command="{Binding SubmitCommand, ElementName=adjustmentHours_popup}"/>
+                        <Button Content="Cancel" Style="{StaticResource LinkButton}" Margin="8,0,0,0"
+                            Command="{Binding CloseCommand, ElementName=adjustmentHours_popup}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="0" Grid.Row="3" Orientation="Horizontal"
+                                HorizontalAlignment="Left" Margin="0,5,0,0">
+                        <Button Content="Clear" Style="{StaticResource LinkButton}"
+                            Command="{Binding DeletingCommand, ElementName=adjustmentHours_popup}"/>
+                    </StackPanel>
+                </Grid>
+                <Border BorderBrush="Gray" BorderThickness="1"/>
+            </Grid>
+        </customs:PopupModal>
+
+        <!-- attendance list totals -->
+        <Grid x:Name="totalsGrid" Grid.Row="1" Grid.Column="1" Margin="10,0,0,0">
+            <Grid.Resources>
+                <Style TargetType="{x:Type customs:BorderedContent}">
+                    <Setter Property="BorderThickness" Value="0.5,0.5,0.5,0"/>
+                    <Setter Property="BorderBrush" Value="Gray"/>
+                    <Setter Property="Padding" Value="5,3,5,3"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Right"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="Background" Value="#fff2cc"/>
+                    <Setter Property="Foreground" Value="Red"/>
+                </Style>
+            </Grid.Resources>
+            <customs:BorderedContent Grid.Column="10" Content="{Binding TotalWorkHours,Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}"/>
+            <customs:BorderedContent Grid.Column="11" Content="{Binding TotalOvertimeHours,Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}"/>
+            <customs:BorderedContent Grid.Column="16" Content="{Binding TotalWorkTotal,Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}"/>
+        </Grid>
+        
+        <!-- attendance list -->
+        <Grid Grid.Row="2" Grid.Column="1" Margin="10,0,0,0">
+            <DataGrid Name="attendanceDataGrid" ItemsSource="{Binding ItemComputedList, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}"
+                      CanUserSortColumns="False" Margin="0,0,0,-1">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding EmployeeNumber}" Width="32">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}"/>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Center}">
+                                <Setter Property="Foreground" Value="Gray"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Employee Name" Binding="{Binding EmployeeName}" Width="120">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                                <Setter Property="Foreground" Value="Black"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsAbsent}" Value="True">
+                                        <Setter Property="Foreground" Value="red"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Type" Binding="{Binding EmployeeType}" Width="80">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Date" Binding="{Binding WorkDate,StringFormat=yyyy-MM-dd}" Width="80">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Absent" Width="50">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock FontFamily="{StaticResource fontawesome-solid}" Text="{StaticResource fa-times}"
+                                           Visibility="{Binding IsAbsent, Converter={StaticResource VisibilityValueConverter}}"
+                                           VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Red"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Actual-In" Width="70">
+                        <DataGridTemplateColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="ToolTip" Value="Employee's actual time-in from the attendance"/>
+                            </Style>
+                        </DataGridTemplateColumn.HeaderStyle>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource LinkButton}" Click="EditTimeIn_btn_Click"
+                                        VerticalAlignment="Center" HorizontalAlignment="Right" Margin="{StaticResource DataGridTextCell.Margin}"
+                                        ToolTip="Click to edit Time-In">
+                                    <Grid>
+                                        <TextBlock Text="{Binding TimeIn, StringFormat=HH:mm}" FontWeight="Bold"/>
+                                        <TextBlock Text="--:--" Visibility="{Binding TimeIn,Converter={StaticResource VisibilityCollapsedValueInverseConverter}}"/>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Actual-Out" Width="70">
+                        <DataGridTemplateColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="ToolTip" Value="Employee's actual time-out from the attendance"/>
+                            </Style>
+                        </DataGridTemplateColumn.HeaderStyle>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource LinkButton}" Click="EditTimeOut_btn_Click"
+                                        VerticalAlignment="Center" HorizontalAlignment="Right" Margin="{StaticResource DataGridTextCell.Margin}"
+                                        ToolTip="Click to edit Time-Out">
+                                    <Grid>
+                                        <TextBlock Text="{Binding TimeOut, StringFormat=HH:mm}" FontWeight="Bold"/>
+                                        <TextBlock Text="--:--" Visibility="{Binding TimeOut,Converter={StaticResource VisibilityCollapsedValueInverseConverter}}"/>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Holiday" Binding="{Binding HolidayFullName}" Width="80">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                                <Setter Property="ToolTip" Value="{Binding HolidayFullName}"/>
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Time-In" Binding="{Binding ComputedTimeIn,StringFormat=HH:mm}" Width="70">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="ToolTip" Value="Computed time-in from the system, based on 'On-Duty' settings"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="Foreground" Value="{StaticResource ComputedTime.Foreground}"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Time-Out" Binding="{Binding ComputedTimeOut,StringFormat=HH:mm}" Width="70">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="ToolTip" Value="Computed time-out from the system, based on 'Off-Duty' settings"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="Foreground" Value="{StaticResource ComputedTime.Foreground}"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Work Hours" Binding="{Binding ActualWorkTime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" Width="70">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Overtime" Width="70" HeaderStyle="{StaticResource DataGridColumnHeader.Right}">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <!-- allow overtime -->
+                                    <TextBlock Text="{Binding ActualWorkOvertime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}"
+                                           TextAlignment="Right" Margin="{StaticResource DataGridTextCell.Margin}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsValidForHolidayRate}" Value="True"/>
+                                                            <Condition Binding="{Binding IsAllowOvertimeForHoliday}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <!-- restrict overtime -->
+                                    <TextBlock TextAlignment="Right" VerticalAlignment="Center"
+                                               Margin="{StaticResource DataGridTextCell.Margin}"
+                                               ToolTip="Holiday overtime is not allowed">
+                                        <Run Text="{Binding ActualWorkOvertime,Mode=OneWay,Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" Foreground="Silver"/>
+                                        <Run FontFamily="{StaticResource fontawesome-solid}" Text="{StaticResource fa-exclamation-triangle}" Foreground="red"/>
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding ComputedOvertime, Converter={StaticResource ObjectToBoolConverter}}" Value="True"/>
+                                                            <Condition Binding="{Binding IsValidForHolidayRate}" Value="True"/>
+                                                            <Condition Binding="{Binding IsAllowOvertimeForHoliday}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Holiday Hours" Binding="{Binding HolidayRegularTime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" Width="70">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="Foreground" Value="Purple"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Holiday OT" Width="70">
+                        <DataGridTemplateColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}"/>
+                        </DataGridTemplateColumn.HeaderStyle>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <!-- allow overtime -->
+                                    <TextBlock Text="{Binding HolidayOvertime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}"
+                                           TextAlignment="Right" Foreground="Purple" Margin="{StaticResource DataGridTextCell.Margin}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsValidForHolidayRate}" Value="True"/>
+                                                            <Condition Binding="{Binding IsAllowOvertimeForHoliday}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <!-- restrict overtime -->
+                                    <TextBlock FontFamily="{StaticResource fontawesome-solid}" Text="{StaticResource fa-exclamation-triangle}" 
+                                               TextAlignment="Right" VerticalAlignment="Center" Foreground="red"
+                                               Margin="{StaticResource DataGridTextCell.Margin}"
+                                               ToolTip="Holiday overtime is not allowed">
+                                        <TextBlock.Style>
+                                            <Style TargetType="{x:Type TextBlock}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding ComputedOvertime, Converter={StaticResource ObjectToBoolConverter}}" Value="True"/>
+                                                            <Condition Binding="{Binding IsValidForHolidayRate}" Value="True"/>
+                                                            <Condition Binding="{Binding IsAllowOvertimeForHoliday}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn Header="Adjustment" Width="70">
+                        <DataGridTemplateColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                            </Style>
+                        </DataGridTemplateColumn.HeaderStyle>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="{StaticResource DataGridTextCell.Margin}">
+                                    <Button Style="{StaticResource LinkButton}" Click="SetAdjustmentTime_btn_Click" ToolTip="Click to add Adjustment Time"
+                                            Visibility="{Binding IsAbsent, Converter={StaticResource VisibilityCollapsedValueInverseConverter}}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Grid>
+                                                <TextBlock Visibility="{Binding AdjustmentTime,Converter={StaticResource VisibilityCollapsedValueConverter}}"
+                                                           FontWeight="Bold">
+                                                    <Run Text="{Binding AdjustmentTimeMode, Converter={StaticResource AdjustedHoursModeTextConverter}}"/>
+                                                    <Run Text="{Binding AdjustmentTime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}"/>
+                                                </TextBlock>
+                                                <TextBlock Text="--:--" Visibility="{Binding AdjustmentTime,Converter={StaticResource VisibilityCollapsedValueInverseConverter}}"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Notes" Binding="{Binding AdjustmentTimeNotes}" Width="70">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                                <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                <Setter Property="ToolTip" Value="{Binding AdjustmentTimeNotes}"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Work Total" Binding="{Binding TotalWorkTime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" Width="70">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="ToolTip" Value="Total Regular Working Hours"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="Foreground" Value="{StaticResource TotalTime.Foreground}"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Holiday Total" Binding="{Binding HolidayTotalTime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" Width="70">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="ToolTip" Value="Total Holiday Hours"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="Foreground" Value="Purple"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            <!--<DataGridTextColumn Header="Manually Edited" Binding="{Binding ModifyTimeDate}" Width="160">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="ToolTip" Value="Actual Time-in/Time-out is edited manually in the system"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="Foreground" Value="Gray"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>-->
+        </Grid>
+    </Grid>
+</Page>

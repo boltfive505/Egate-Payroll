@@ -1,0 +1,41 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:CustomControls">
+    <Thickness x:Key="LabelContainer.ContentSpacing.Top">0,0,0,3</Thickness>
+    <Thickness x:Key="LabelContainer.ContentSpacing.Left">3,0,0,0</Thickness>
+    
+    <ControlTemplate x:Key="LabelPlacementTopTemplate" TargetType="{x:Type local:LabelContainer}">
+        <Grid HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <ContentPresenter Grid.Row="0" Content="{TemplateBinding Header}" HorizontalAlignment="Left"/>
+            <ContentPresenter Grid.Row="1" Content="{TemplateBinding Content}" Margin="{TemplateBinding ContentSpacing}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+        </Grid>
+    </ControlTemplate>
+    <ControlTemplate x:Key="LabelPlacementLeftTemplate" TargetType="{x:Type local:LabelContainer}">
+        <Grid HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ContentPresenter Grid.Column="0" Content="{TemplateBinding Header}" VerticalAlignment="Center"/>
+            <ContentPresenter Grid.Column="1" Content="{TemplateBinding Content}" Margin="{TemplateBinding ContentSpacing}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+        </Grid>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type local:LabelContainer}">
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="ContentSpacing" Value="{StaticResource LabelContainer.ContentSpacing.Top}"/>
+        <Setter Property="Template" Value="{StaticResource LabelPlacementTopTemplate}"/>
+        <Setter Property="IsTabStop" Value="False"/>
+        <Style.Triggers>
+            <Trigger Property="Placement" Value="Left">
+                <Setter Property="ContentSpacing" Value="{StaticResource LabelContainer.ContentSpacing.Left}"/>
+                <Setter Property="Template" Value="{StaticResource LabelPlacementLeftTemplate}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

@@ -1,0 +1,66 @@
+﻿<UserControl x:Class="Egate_Payroll.Templates.Contribution_Tables.withholding_tax_table"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Egate_Payroll.Templates.Contribution_Tables"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Loaded="UserControl_Loaded">
+    <Grid Background="White">
+        <DataGrid x:Name="taxDg" CanUserSortColumns="False">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Edit">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-pen}" Style="{StaticResource BorderlessButton}"
+                                    Foreground="Silver" Click="Button_Click_1" ToolTip="Edit Bracket"
+                                    VerticalAlignment="Center" HorizontalAlignment="Center" Margin="{StaticResource DataGridTextCell.Margin}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Compensation Range" Width="190">
+                    <DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}"/>
+                    </DataGridTemplateColumn.HeaderStyle>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid Margin="{StaticResource DataGridTextCell.Margin}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="70"/>
+                                    <ColumnDefinition Width="auto"/>
+                                    <ColumnDefinition Width="70"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding CompensationFrom, StringFormat={}₱ {0:N2}}" TextAlignment="Right" Visibility="{Binding CompensationFrom, Converter={StaticResource VisibilityValueConverter}}"/>
+                                <TextBlock Grid.Column="0" Text="BELOW" TextAlignment="Right" Visibility="{Binding CompensationFrom, Converter={StaticResource VisibilityValueInverseConverter}}"/>
+                                <TextBlock Grid.Column="1" Text="   - " TextAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="{Binding CompensationTo, StringFormat={}₱ {0:N2}}" TextAlignment="Right" Visibility="{Binding CompensationTo, Converter={StaticResource VisibilityValueConverter}}"/>
+                                <TextBlock Grid.Column="2" Text="OVER" TextAlignment="Right" Visibility="{Binding CompensationTo, Converter={StaticResource VisibilityValueInverseConverter}}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Prescribed Withholding Tax" Width="200">
+                    <DataGridTemplateColumn.HeaderStyle>
+                        <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}"/>
+                    </DataGridTemplateColumn.HeaderStyle>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Grid Height="50" HorizontalAlignment="Center">
+                                <StackPanel Orientation="Vertical" Margin="{StaticResource DataGridTextCell.Margin}" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding WithholdingTaxFixed, StringFormat={}₱ {0:N2}}"/>
+                                    <TextBlock Visibility="{Binding CompensationFrom,Converter={StaticResource VisibilityCollapsedValueConverter}}" Margin="0,3,0,0">
+                                        <Run Text="plus"/>
+                                        <Run Text="{Binding WithholdingTaxAdditionalRate, StringFormat=P}"/>
+                                        <Run Text="over"/>
+                                        <Run Text="{Binding CompensationFrom, StringFormat={}₱ {0:N2}}"/>
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

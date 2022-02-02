@@ -1,0 +1,233 @@
+﻿<Page x:Class="Egate_Payroll.Pages.tax_calendar"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:me="clr-namespace:Egate_Payroll"
+      xmlns:local="clr-namespace:Egate_Payroll.Pages"
+      xmlns:converters="clr-namespace:Egate_Payroll.Converters"
+      xmlns:templates="clr-namespace:Egate_Payroll.Templates"
+      xmlns:objs="clr-namespace:Egate_Payroll.Objects.TaxCalendar"
+      xmlns:cal="clr-namespace:CustomMonthlyCalendar;assembly=CustomMonthlyCalendar"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="tax_calendar"
+      Loaded="Page_Loaded">
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="1.3*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0" Grid.Row="0">
+            <DockPanel>
+                <GroupBox Header="Filters" VerticalAlignment="Top" HorizontalAlignment="Left"
+                          DataContext="{Binding Filters, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}">
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.GroupBox.Margin}">
+                        <WrapPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                                <TextBlock Text="Category"/>
+                                <ComboBox Width="120" ItemsSource="{Binding CategoryList}" SelectedValue="{Binding FilterCategory,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMemberPath="Value" SelectedValuePath="Key"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                                <TextBlock Text="Form Keyword"/>
+                                <TextBox Width="130" Text="{Binding FilterKeyword, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                                <TextBlock Text="   "/>
+                                <CheckBox Content="Show Inactive" Style="{StaticResource RightCheckBox}"
+                                          IsChecked="{Binding FilterInactive,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </WrapPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <StackPanel Orientation="Horizontal" Margin="10,10,0,0">
+                    <Button Content="Add Form" Click="AddPeriod_btn_Click"
+                            VerticalAlignment="Top" HorizontalAlignment="Left"
+                            Background="DarkGreen" Foreground="White" FontWeight="Bold"/>
+                </StackPanel>
+            </DockPanel>
+        </Grid>
+
+        <!-- filing period list -->
+        <Grid Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Margin="0,31,0,0">
+            <DataGrid ItemsSource="{Binding ItemFilingPeriodList, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Page}}">
+                <DataGrid.CellStyle>
+                    <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCell.Style.Default}">
+                        <Setter Property="Foreground" Value="Black"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                <Setter Property="Foreground" Value="DarkGray"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.CellStyle>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" HeaderStyle="{StaticResource DataGridColumnHeader.Center}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Center}" Foreground="Gray"/>
+                    <DataGridTemplateColumn Header="Edit">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-pen}"
+                                        Style="{StaticResource BorderlessButton}" Click="AddPeriod_btn_Click"
+                                        Foreground="Silver" ToolTip="Edit Tax Form Period"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Form Name" Binding="{Binding FormName}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                                <Setter Property="ToolTip" Value="{Binding Description}"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Category" Binding="{Binding Category}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                                <Setter Property="ToolTip" Value="{Binding Description}"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Period Type" SortMemberPath="PeriodType">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="{StaticResource DataGridTextCell.Margin}">
+                                    <TextBlock Text="{Binding PeriodType}"/>
+                                    <TextBlock FontFamily="{StaticResource fontawesome-solid}" Text="{StaticResource fa-ban}"
+                                               Visibility="{Binding HasExclusion, Converter={StaticResource VisibilityCollapsedValueConverter}}"
+                                               Foreground="Red" VerticalAlignment="Center" Margin="3,0,0,0">
+                                        <TextBlock.ToolTip>
+                                            <Grid>
+                                                <!-- start exluded months -->
+                                                <StackPanel Orientation="Vertical">
+                                                    <StackPanel.Style>
+                                                        <Style TargetType="{x:Type StackPanel}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding PeriodType}" Value="{x:Static me:FilingPeriodType.Monthly}">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </StackPanel.Style>
+                                                    <TextBlock Text="Excluded Month/s:" FontWeight="Bold" Foreground="Red"/>
+                                                    <ItemsControl ItemsSource="{Binding MonthInclusionList}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate DataType="{x:Type objs:TaxFilingPeriodInclusionViewModel}">
+                                                                <TextBlock Text="{Binding Value, Converter={StaticResource MonthNameConverter}}">
+                                                                    <TextBlock.Style>
+                                                                        <Style TargetType="{x:Type TextBlock}">
+                                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding IsIncluded}" Value="True">
+                                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </TextBlock.Style>
+                                                                </TextBlock>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                                <!-- end exluded months -->
+                                                <!-- start exluded quarter -->
+                                                <StackPanel Orientation="Vertical">
+                                                    <StackPanel.Style>
+                                                        <Style TargetType="{x:Type StackPanel}">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding PeriodType}" Value="{x:Static me:FilingPeriodType.EndOfQuarter}">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </StackPanel.Style>
+                                                    <TextBlock Text="Excluded Quarter/s:" FontWeight="Bold" Foreground="Red"/>
+                                                    <ItemsControl ItemsSource="{Binding QuarterInclusionList}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate DataType="{x:Type objs:TaxFilingPeriodInclusionViewModel}">
+                                                                <TextBlock Text="{Binding Value, Converter={StaticResource OrdinalStringConverter}, StringFormat={}{0} Quarter}">
+                                                                    <TextBlock.Style>
+                                                                        <Style TargetType="{x:Type TextBlock}">
+                                                                            <Setter Property="Visibility" Value="Visible"/>
+                                                                            <Style.Triggers>
+                                                                                <DataTrigger Binding="{Binding IsIncluded}" Value="True">
+                                                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                                                </DataTrigger>
+                                                                            </Style.Triggers>
+                                                                        </Style>
+                                                                    </TextBlock.Style>
+                                                                </TextBlock>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </StackPanel>
+                                                <!-- end exluded quarter -->
+                                            </Grid>
+                                        </TextBlock.ToolTip>
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Due Date" Binding="{Binding DueDateStr}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}"/>
+                    <DataGridTemplateColumn Header="PAY">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Grid Margin="{StaticResource DataGridTextCell.Margin}" Style="{StaticResource DataGridCell.GridStyle.ShowOnHover}">
+                                    <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-plus-circle}"
+                                            Style="{StaticResource BorderlessButton}" Click="AddFormPayment_btn_Click"
+                                            Foreground="DarkGreen" ToolTip="Add form payment"/>
+                                </Grid>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Form Title" Binding="{Binding FormTitle}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                                <Setter Property="ToolTip" Value="{Binding Description}"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- period calendar -->
+        <Grid Grid.Column="1" Grid.Row="1" Margin="20,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60*"/>
+                <RowDefinition Height="311*"/>
+            </Grid.RowDefinitions>
+            <cal:MonthlyCalendar x:Name="taxCalendar" ItemsSource="{Binding FilingPeriodsDayList, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Page}}"
+                                 Style="{StaticResource TaxCalendarStyle}"
+                                 MonthlyCalendarDayButtonStyle="{StaticResource TaxCalendarDayButtonStyle}"
+                                 DisplayMonthChanged="taxCalendar_DisplayMonthChanged" Grid.RowSpan="2">
+                <cal:MonthlyCalendar.BindingTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <ListBox ItemsSource="{Binding Items}" Background="Transparent">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-plus-circle}"
+                                                    Style="{StaticResource BorderlessButton}" Click="AddFormPayment_btn_Click"
+                                                    Foreground="DarkGreen" Margin="0,0,5,0" ToolTip="Add form payment for this period"/>
+                                            <TextBlock Text="{Binding Item.FormName}" FontSize="11"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </DataTemplate>
+                </cal:MonthlyCalendar.BindingTemplate>
+            </cal:MonthlyCalendar>
+        </Grid>
+    </Grid>
+</Page>

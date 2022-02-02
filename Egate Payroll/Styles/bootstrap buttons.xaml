@@ -1,0 +1,82 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Egate_Payroll.Styles">
+    <SolidColorBrush x:Key="btn.Foreground" Color="#333"/>
+    <!-- btn primary -->
+    <SolidColorBrush x:Key="btn.Primary.Normal.Background" Color="#333"/>
+    <SolidColorBrush x:Key="btn.Primary.Normal.BorderBrush" Color="#333"/>
+    <SolidColorBrush x:Key="btn.Primary.Hover.Background" Color="#333"/>
+    <SolidColorBrush x:Key="btn.Primary.Hover.BorderBrush" Color="#333"/>
+    <SolidColorBrush x:Key="btn.Primary.Pressed.Background" Color="#333"/>
+    <SolidColorBrush x:Key="btn.Primary.Pressed.BorderBrush" Color="#333"/>
+    <!-- btn success -->
+    <SolidColorBrush x:Key="btn.Success.Normal.Background" Color="#333"/>
+    <SolidColorBrush x:Key="btn.Success.Normal.BorderBrush" Color="#333"/>
+    <SolidColorBrush x:Key="btn.Success.Hover.Background" Color="#333"/>
+    <SolidColorBrush x:Key="btn.Success.Hover.BorderBrush" Color="#333"/>
+    <SolidColorBrush x:Key="btn.Success.Pressed.Background" Color="#333"/>
+    <SolidColorBrush x:Key="btn.Success.Pressed.BorderBrush" Color="#333"/>
+    
+
+    <Style x:Key="btn" TargetType="{x:Type Button}">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Padding" Value="12,6,12,6"/>
+        <Setter Property="Foreground" Value="{StaticResource btn.Foreground}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border BorderThickness="1" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" CornerRadius="4">
+                        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Margin="{TemplateBinding Padding}">
+                            <ContentPresenter.Resources>
+                                <Style TargetType="{x:Type TextBlock}">
+                                </Style>
+                            </ContentPresenter.Resources>
+                        </ContentPresenter>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="btn-primary" TargetType="{x:Type Button}">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Padding" Value="12,6,12,6"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="#337ab7"/>
+        <Setter Property="BorderBrush" Value="#2e6da4"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border BorderThickness="1" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}" CornerRadius="4">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualStateGroup.Transitions>
+                                    <VisualTransition GeneratedDuration="0:0:0.2"/>
+                                </VisualStateGroup.Transitions>
+                                <VisualState x:Name="Normal"/>
+                                <VisualState x:Name="Pressed">
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetProperty="(Background).(SolidColorBrush.Color)" To="#204d74"/>
+                                        <ColorAnimation Storyboard.TargetProperty="(BorderBrush).(SolidColorBrush.Color)" To="#122b40"/>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="MouseOver">
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetProperty="(Background).(SolidColorBrush.Color)" To="#286090"/>
+                                        <ColorAnimation Storyboard.TargetProperty="(BorderBrush).(SolidColorBrush.Color)" To="#204d74"/>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                        <ContentPresenter Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" Margin="{TemplateBinding Padding}">
+                            <ContentPresenter.Resources>
+                                <Style TargetType="{x:Type TextBlock}">
+                                </Style>
+                            </ContentPresenter.Resources>
+                        </ContentPresenter>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

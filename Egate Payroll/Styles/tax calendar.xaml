@@ -1,0 +1,100 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:Egate_Payroll.Styles"
+                    xmlns:cal="clr-namespace:CustomMonthlyCalendar;assembly=CustomMonthlyCalendar">
+    <Style TargetType="{x:Type cal:MonthlyCalendar}" x:Key="TaxCalendarStyle">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type cal:MonthlyCalendar}">
+                    <ControlTemplate.Resources>
+                        <DataTemplate x:Key="{x:Static cal:MonthlyCalendar.DaysOfWeekTitleTemplateResourceKey}">
+                            <Grid Background="SkyBlue">
+                                <TextBlock Text="{Binding}" Margin="0,3,0,3"
+                                           TextAlignment="Center" FontWeight="Bold"/>
+                                <Border BorderBrush="Gray" BorderThickness="0,1,0,1"/>
+                            </Grid>
+                        </DataTemplate>
+                        <Style x:Key="MonthHeaderButtons" TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                            <Setter Property="Cursor" Value="Hand"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Grid Background="{TemplateBinding Background}">
+                                            <Border CornerRadius="2" BorderBrush="Gray" BorderThickness="1" Padding="3,2,3,2">
+                                                <TextBlock Text="{TemplateBinding Content}" FontSize="10" TextAlignment="Center"/>
+                                            </Border>
+                                        </Grid>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                        <Style x:Key="MonthHeaderTitle" TargetType="{x:Type TextBlock}">
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="FontSize" Value="16"/>
+                            <Setter Property="TextAlignment" Value="Center"/>
+                            <Setter Property="Width" Value="150"/>
+                        </Style>
+                    </ControlTemplate.Resources>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <!--header-->
+                        <Grid Grid.Row="0">
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,5" HorizontalAlignment="Center">
+                                <Button x:Name="PART_PreviousMonth" Content="PREVIOUS" Style="{StaticResource MonthHeaderButtons}" Background="LightBlue" Width="60"/>
+                                <TextBlock Text="{Binding DisplayMonth, StringFormat=MMMM yyyy, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource MonthHeaderTitle}"/>
+                                <Button x:Name="PART_NextMonth" Content="NEXT" Style="{StaticResource MonthHeaderButtons}" Background="LightGreen" Width="60"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,5,0,5" HorizontalAlignment="Right">
+                                <Button x:Name="PART_TodayMonth" Content="Today" Style="{StaticResource MonthHeaderButtons}" Background="Orange" Margin="50,0,0,0" Width="40"/>
+                            </StackPanel>
+                        </Grid>
+                        <!--body-->
+                        <Grid Grid.Row="1">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                <!--days of week-->
+                                <Grid x:Name="PART_DaysOfWeek" Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                </Grid>
+                                <!--days of month-->
+                                <Grid x:Name="PART_DaysOfMonth" Grid.Row="1" Background="White">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

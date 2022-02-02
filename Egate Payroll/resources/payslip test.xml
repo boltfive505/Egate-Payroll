@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="payslip stylesheet.xsl"?>
+<PayslipItems xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Payslip>
+    <EmployeeName>Anna Marie Germino</EmployeeName>
+    <EmployeeNotes>testing 123</EmployeeNotes>
+    <Earnings>
+      <Earning Name="Regular">
+        <Hours>31:47</Hours>
+        <Rate>71.88</Rate>
+        <Current>4,010.19</Current>
+      </Earning>
+      <Earning Name="Overtime">
+        <Hours>31:47</Hours>
+        <Rate>71.88</Rate>
+        <Current>4,010.19</Current>
+      </Earning>
+      <Earning Name="Allowance">
+        <Hours>31:47</Hours>
+        <Rate>71.88</Rate>
+        <Current>0.00</Current>
+      </Earning>
+    </Earnings>
+    <Deductions>
+      <Deduction Name="SSS">0.00</Deduction>
+      <Deduction Name="PhilHealth">0.00</Deduction>
+      <Deduction Name="Pag-Ibig">0.00</Deduction>
+      <Deduction Name="Tax">0.00</Deduction>
+    </Deductions>
+    <PayPeriodStart>2021-04-21</PayPeriodStart>
+    <PayPeriodEnd>2021-04-21</PayPeriodEnd>
+    <PayDate>2021-04-21</PayDate>
+    <GrossPay>4,010.19</GrossPay>
+    <TotalDeductions>0.00</TotalDeductions>
+    <NetPay>4,010.19</NetPay>
+  </Payslip>
+</PayslipItems>

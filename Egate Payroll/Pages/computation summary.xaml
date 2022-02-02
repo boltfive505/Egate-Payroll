@@ -1,0 +1,661 @@
+﻿<Page x:Class="Egate_Payroll.Pages.computation_summary"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Egate_Payroll.Pages"
+      xmlns:system="clr-namespace:System;assembly=mscorlib"
+      xmlns:templates="clr-namespace:Egate_Payroll.Templates"
+      xmlns:extTool="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+      xmlns:customs="clr-namespace:CustomControls;assembly=CustomControls"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="settings_payroll"
+      Loaded="Page_Loaded">
+    <Page.Resources>
+        
+    </Page.Resources>
+    <Grid Background="White">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="140"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="350"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- cutoff list -->
+        <Grid Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
+            <GroupBox Header="Cutoff List">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="123"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding ItemCutoffList,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}">
+                        <DataGrid.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCell.Style.Default}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="Background" Value="#ddcbf5"/>
+                                        <Setter Property="Foreground" Value="white"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.CellStyle>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource DataGridRow.Style.Default}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                        <Setter Property="Background" Value="#ddcbf5"/>
+                                        <Setter Property="Foreground" Value="white"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Center}">
+                                        <Setter Property="Foreground" Value="Gray"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Selected">
+                                <DataGridTemplateColumn.HeaderStyle>
+                                    <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                    </Style>
+                                </DataGridTemplateColumn.HeaderStyle>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected,Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"
+                                                  VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False"
+                                                  IsEnabled="False"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Period" SortMemberPath="StartDate">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock VerticalAlignment="Center" TextAlignment="Center" 
+                                               Margin="{StaticResource DataGridTextCell.Margin}">
+                                            <Run Text="{Binding StartDate,StringFormat=yyyy-MM-dd}" Foreground="Red" FontWeight="Bold"/>
+                                            <Run Text="-" Foreground="Gray"/>
+                                            <Run Text="{Binding EndDate,StringFormat=yyyy-MM-dd}" Foreground="Purple" FontWeight="Bold"/>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="Saved" Binding="{Binding ImportTime, StringFormat=yyyy-MM-dd hh:mm:ss tt}"
+                                            SortMemberPath="ImportTime" SortDirection="Descending">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                        <Setter Property="Foreground" Value="Gray"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <Grid Grid.Row="0" Grid.Column="1" Margin="10,0,0,0">
+            <DockPanel>
+                <!-- filters -->
+                <GroupBox Header="Filters" VerticalAlignment="Top" HorizontalAlignment="Left"
+                          DataContext="{Binding Filters, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}"
+                          Margin="{StaticResource Filters.Fields.Margin}">
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.GroupBox.Margin}">
+                        <WrapPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Vertical" Margin="{StaticResource Filters.Fields.Margin}">
+                                <TextBlock Text="Employee Name"/>
+                                <customs:SearchableComboBox Width="150" ItemsSource="{Binding NameList}" SelectedItem="{Binding FilterName}"/>
+                            </StackPanel>
+                            <Button Content="Reset" Click="ResetFilter_btn_Click"
+                                    VerticalAlignment="Bottom" Width="65"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <UniformGrid Columns="1" Margin="50,10,0,60" HorizontalAlignment="Left">
+                    <Button Content="Print All Payslip" Click="PrintAllPayslip_btn_Click" VerticalAlignment="Top"/>
+                    <Button Content="Export Excel" Click="ExportExcel_Click" VerticalAlignment="Bottom" Foreground="Purple" BorderBrush="Purple"/>
+                </UniformGrid>
+            </DockPanel>
+
+            <StackPanel x:Name="totalsGroup2" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="0,0,0,10">
+                <TextBlock Width="200" Margin="0,0,15,0">
+                    <Run Text="Regular Hours to be met:"/>
+                    <Run Text="{Binding CurrentPeriod.RegularHours, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType=Page}}" FontWeight="Bold"/>
+                </TextBlock>
+                <TextBlock Width="200" Margin="0,0,15,0">
+                    <Run Text="Total Final Regular Hours:"/>
+                    <Run Text="{Binding TotalRegularHours,Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" FontWeight="Bold"/>
+                </TextBlock>
+                <TextBlock Width="200" Margin="0,0,15,0">
+                    <Run Text="Total Final Overtime Hours:"/>
+                    <Run Text="{Binding TotalOvertimeHours,Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" FontWeight="Bold"/>
+                </TextBlock>
+            </StackPanel>
+
+            <!-- totals -->
+            <StackPanel x:Name="totalsGroup" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <StackPanel Orientation="Vertical">
+                    <TextBlock FontSize="18" Margin="5">
+                        <Run Foreground="Gray"># of Employees:</Run>
+                        <Run Text="{Binding TotalEmployees}" Foreground="Red" FontWeight="Bold"/>
+                    </TextBlock>
+                    <TextBlock FontSize="18" Margin="5">
+                        <Run Foreground="Gray">Total Net:</Run>
+                        <Run Text="{Binding TotalNetIncome, StringFormat={}₱ {0:N2}}" Foreground="Red" FontWeight="Bold"/>
+                    </TextBlock>
+                </StackPanel>
+                <GroupBox Header="Contributions Total" Height="100" Margin="40,0,0,35">
+                    <DataGrid ItemsSource="{Binding TotalDeductions}" BorderThickness="0" Background="White" VerticalAlignment="Center" CanUserResizeColumns="False" CanUserSortColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Name}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Left}" Width="85"/>
+                            <DataGridTextColumn Header="SSS" Binding="{Binding SssTotal, StringFormat={}₱ {0:N2}}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}" Width="75">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                        <Setter Property="Background" Value="{StaticResource SSS.Background}"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                        <Setter Property="BorderBrush" Value="Gray"/>
+                                        <Setter Property="Padding" Value="3"/>
+                                        <Setter Property="ToolTip" Value="SSS Total"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="PhilHealth" Binding="{Binding PhilHealthTotal, StringFormat={}₱ {0:N2}}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}" Width="75">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                        <Setter Property="Background" Value="{StaticResource PhilHealth.Background}"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                        <Setter Property="BorderBrush" Value="Gray"/>
+                                        <Setter Property="Padding" Value="3"/>
+                                        <Setter Property="ToolTip" Value="PhilHealth Total"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Pag-Ibig" Binding="{Binding PagIbigTotal, StringFormat={}₱ {0:N2}}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}" Width="75">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                        <Setter Property="Background" Value="{StaticResource Pagibig.Background}"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                        <Setter Property="BorderBrush" Value="Gray"/>
+                                        <Setter Property="Padding" Value="3"/>
+                                        <Setter Property="ToolTip" Value="Pag-Ibig Total"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Tax" Binding="{Binding TaxTotal, StringFormat={}₱ {0:N2}}" ElementStyle="{StaticResource DataGridTextColumn.ElementStyle.Right}" Width="75">
+                                <DataGridTextColumn.HeaderStyle>
+                                    <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                        <Setter Property="Background" Value="{StaticResource BIR.Background}"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                        <Setter Property="BorderBrush" Value="Gray"/>
+                                        <Setter Property="Padding" Value="3"/>
+                                        <Setter Property="ToolTip" Value="Tax Total"/>
+                                    </Style>
+                                </DataGridTextColumn.HeaderStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+            </StackPanel>
+        </Grid>
+
+        <!-- computation popup -->
+        <customs:PopupModal x:Name="showComputation_popup" IsOpen="False" StaysOpen="false" AllowsTransparency="True" Placement="Mouse">
+            <Grid Background="White" Margin="0,0,15,15">
+                <Grid.Effect>
+                    <DropShadowEffect/>
+                </Grid.Effect>
+                <templates:gross_income_computation DataContext="{Binding}"/>
+                <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-times}"
+                            Style="{StaticResource BorderlessButton}" VerticalAlignment="Top" HorizontalAlignment="Right"
+                            Foreground="Red" Margin="10"
+                        Command="{Binding ElementName=showComputation_popup, Path=CloseCommand}"/>
+                <Border BorderBrush="Gray" BorderThickness="1"/>
+            </Grid>
+        </customs:PopupModal>
+        
+        <!-- add adjustment amount popup -->
+        <customs:PopupModal x:Name="addAdjustmentAmount_popup" IsOpen="False" StaysOpen="False" AllowsTransparency="true" Placement="mouse">
+            <Grid Background="White" Margin="0,0,15,15">
+                <Grid.Effect>
+                    <DropShadowEffect/>
+                </Grid.Effect>
+                <Grid Margin="15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <!-- adjustment amount field -->
+                    <TextBlock Grid.Column="0" Grid.Row="0" Text="Adjustment Amount" Margin="0,0,8,0"/>
+                    <extTool:DecimalUpDown Grid.Column="1" Grid.Row="0" x:Name="AdjustmentAmountValue"
+                                           Value="{Binding Amount,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                           ShowButtonSpinner="False" FormatString="N2" TextAlignment="Right" Width="80"/>
+                    <!-- buttons -->
+                    <StackPanel Grid.Column="1" Grid.Row="3" Orientation="Horizontal"
+                                HorizontalAlignment="Right" Margin="0,5,0,0">
+                        <Button Content="Save" Style="{StaticResource LinkButton}"
+                            Command="{Binding SubmitCommand, ElementName=addAdjustmentAmount_popup}"/>
+                        <Button Content="Cancel" Style="{StaticResource LinkButton}" Margin="8,0,0,0"
+                            Command="{Binding CloseCommand, ElementName=addAdjustmentAmount_popup}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="0" Grid.Row="3" Orientation="Horizontal"
+                                HorizontalAlignment="Left" Margin="0,5,0,0">
+                        <Button Content="Clear" Style="{StaticResource LinkButton}"
+                            Command="{Binding DeletingCommand, ElementName=addAdjustmentAmount_popup}"/>
+                    </StackPanel>
+                </Grid>
+                <Border BorderBrush="Gray" BorderThickness="1"/>
+            </Grid>
+        </customs:PopupModal>
+
+        <Grid Grid.Row="1" Grid.Column="1" Margin="10,0,0,0">
+            <DataGrid x:Name="computationDg" ItemsSource="{Binding ItemSummaryList, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Page}}"
+                      CanUserSortColumns="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding EmployeeNumber}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Center}">
+                                <Setter Property="Foreground" Value="Gray"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Employee Name" Binding="{Binding EmployeeName}" Width="120">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Type" Binding="{Binding EmployeeType}" Width="90">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Left}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Print">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-print}"
+                                        Click="PrintSinglePayslip_btn_Click" Style="{StaticResource BorderlessButton}"
+                                        Foreground="Gray" Margin="{StaticResource DataGridTextCell.Margin}"
+                                        VerticalAlignment="Center" HorizontalAlignment="Center"
+                                        ToolTip="Print Payslip"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Hourly Rate" Binding="{Binding HourlyRate, StringFormat={}₱ {0:N2}}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding HourlyRate, Converter={StaticResource ObjectToBoolConverter}}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Allowance" Binding="{Binding AllowanceRate, StringFormat={}₱ {0:N2}}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AllowanceRate, Converter={StaticResource ObjectToBoolConverter}}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Work Hours" Binding="{Binding SubtotalWorkTime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" Width="70">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="Background" Value="{StaticResource RegularTime.Background}"/>
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Overtime" Binding="{Binding SubtotalOvertime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" Width="70">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="Background" Value="{StaticResource RegularTime.Background}"/>
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Adjust Hours" Width="70">
+                        <DataGridTemplateColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="Background" Value="{StaticResource RegularTime.Background}"/>
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                            </Style>
+                        </DataGridTemplateColumn.HeaderStyle>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Visibility="{Binding TotalAdjustmentTime,Converter={StaticResource VisibilityCollapsedValueConverter}}"
+                                           TextAlignment="Right" Margin="{StaticResource DataGridTextCell.Margin}">
+                                    <Run Text="{Binding FinalAdjustmentHoursMode, Converter={StaticResource AdjustedHoursModeTextConverter}}"/>
+                                    <Run Text="{Binding TotalAdjustmentTime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}"/>
+                                </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Work Total" Binding="{Binding TotalWorkTime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" Width="70">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="Background" Value="{StaticResource RegularTime.Background}"/>
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                                <Setter Property="ToolTip" Value="Total Regular Working Hours, including Overtime"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="Foreground" Value="Red"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Holiday Hours" Binding="{Binding SubtotalHolidayTime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" Width="70">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="Background" Value="{StaticResource HolidayTime.Background}"/>
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                                <Setter Property="ToolTip" Value="Total Holiday Hours"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="Foreground" Value="Purple"/>
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SubtotalHolidayTime,Converter={StaticResource ObjectToBoolConverter}}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Holiday OT" Binding="{Binding SubtotalHolidayOvertime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" Width="70">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="Background" Value="{StaticResource HolidayTime.Background}"/>
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                                <Setter Property="ToolTip" Value="Total Holiday Hours"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="Foreground" Value="Purple"/>
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SubtotalHolidayOvertime,Converter={StaticResource ObjectToBoolConverter}}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Holiday Total" Binding="{Binding TotalHolidayTime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" Width="70">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="Background" Value="{StaticResource HolidayTime.Background}"/>
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                                <Setter Property="ToolTip" Value="Total Holiday Hours"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="Foreground" Value="Red"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding TotalHolidayTime,Converter={StaticResource ObjectToBoolConverter}}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Final RH" Binding="{Binding FinalRegularHours, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="Background" Value="{StaticResource FinalTime.Background}"/>
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCell.Style.Default}">
+                                <Setter Property="Background" Value="PaleGreen"/>
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Final OT" Binding="{Binding FinalOvertime, Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                                <Setter Property="Background" Value="{StaticResource FinalTime.Background}"/>
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}" BasedOn="{StaticResource DataGridCell.Style.Default}">
+                                <Setter Property="Background" Value="LightGoldenrodYellow"/>
+                            </Style>
+                        </DataGridTextColumn.CellStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Allowance Income" Binding="{Binding GrandTotalAllowance,StringFormat={}₱ {0:N2}}">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Total Gross Income">
+                        <DataGridTemplateColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}">
+                            </Style>
+                        </DataGridTemplateColumn.HeaderStyle>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="{StaticResource DataGridTextCell.Margin}">
+                                    <TextBlock Text="{Binding GrossIncome, StringFormat={}₱ {0:N2}}"
+                                               Foreground="DarkGreen" FontWeight="Bold"/>
+                                    <Button FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-calculator}"
+                                            Style="{StaticResource BorderlessButton}" Click="ShowComputation_btn_Click"
+                                            Foreground="Gray" Margin="5,0,0,0" ToolTip="Show Computation"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Net Income" Binding="{Binding NetPay,StringFormat={}₱ {0:N2}}" Width="100">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Right}"/>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                                <Setter Property="Foreground" Value="Red"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTemplateColumn Header="Adjust Amount">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="{StaticResource DataGridTextCell.Margin}">
+                                    <TextBlock Text="{Binding AdjustmentAmount, StringFormat={}₱ {0:N2}}"
+                                               Visibility="{Binding AdjustmentAmount, Converter={StaticResource VisibilityCollapsedValueConverter}}"/>
+                                    <Button Style="{StaticResource BorderlessButton}" Click="AddAdjustmentAmount_btn_Click"
+                                            FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-plus}"
+                                            Margin="5,0,0,0" Foreground="Gray" ToolTip="Add Adjustment Amount"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <!-- begin sss contribution -->
+                    <DataGridTextColumn Header="SSS Employee" Binding="{Binding Deductions.SssEmployeeContribution,StringFormat={}₱ {0:N2}}" Width="100">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                <Setter Property="Background" Value="{StaticResource SSS.Background}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                                <Setter Property="ToolTip" Value="SSS Employee Contribution"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="SSS Employer" Binding="{Binding Deductions.SssEmployerContribution,StringFormat={}₱ {0:N2}}" Width="100">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                <Setter Property="Background" Value="{StaticResource SSS.Background}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                                <Setter Property="ToolTip" Value="SSS Employer Contribution"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!-- end sss contribution -->
+                    <!-- begin philhealth contribution -->
+                    <DataGridTextColumn Header="Philhealth Employee" Binding="{Binding Deductions.PhilhealthEmployeeContribution,StringFormat={}₱ {0:N2}}" Width="130">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                <Setter Property="Background" Value="{StaticResource PhilHealth.Background}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                                <Setter Property="ToolTip" Value="Philhealth Employee Contribution"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="PhilHealth Employer" Binding="{Binding Deductions.PhilhealthEmployerContribution,StringFormat={}₱ {0:N2}}" Width="130">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                <Setter Property="Background" Value="{StaticResource PhilHealth.Background}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                                <Setter Property="ToolTip" Value="Philhealth Employer Contribution"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!-- end philhealth contribution -->
+                    <!-- begin pagibig contribution -->
+                    <DataGridTextColumn Header="Pag-Ibig Employee" Binding="{Binding Deductions.PagibigEmployeeContribution,StringFormat={}₱ {0:N2}}" Width="130">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                <Setter Property="Background" Value="{StaticResource Pagibig.Background}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                                <Setter Property="ToolTip" Value="Pag-Ibig Employee Contribution"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Pag-Ibig Employer" Binding="{Binding Deductions.PagibigEmployerContribution,StringFormat={}₱ {0:N2}}" Width="130">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                <Setter Property="Background" Value="{StaticResource Pagibig.Background}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                                <Setter Property="ToolTip" Value="Pag-Ibig Employer Contribution"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!-- end pagibig contribution -->
+                    <!-- begin tax contribution -->
+                    <DataGridTextColumn Header="Tax Employee" Binding="{Binding Deductions.TaxEmployeeContribution,StringFormat={}₱ {0:N2}}" Width="100">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource DataGridColumnHeader.Center}">
+                                <Setter Property="Background" Value="{StaticResource BIR.Background}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="BorderThickness" Value="0.5,0,0.5,0"/>
+                                <Setter Property="BorderBrush" Value="Gray"/>
+                                <Setter Property="ToolTip" Value="Withholding Tax Employee Contribution"/>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource DataGridTextColumn.ElementStyle.Right}">
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <!-- end tax contribution -->
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</Page>

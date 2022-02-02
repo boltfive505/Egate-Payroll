@@ -1,0 +1,48 @@
+﻿<UserControl x:Class="Egate_Payroll.Templates.open_camera"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Egate_Payroll.Templates"
+             xmlns:aforge="clr-namespace:AForge.Controls;assembly=AForge.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="450"
+             Unloaded="UserControl_Unloaded">
+    <Grid Background="White">
+        <StackPanel Orientation="Vertical" Margin="15">
+            <!-- camera controls -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <!-- select camera -->
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Select Camera:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="Gray"/>
+                    <ComboBox x:Name="cameraList_cbox" Width="200" VerticalAlignment="Center"
+                              DisplayMemberPath="Name" SelectionChanged="cameraList_cbox_SelectionChanged"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <Button x:Name="capture_btn" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-camera}" Click="capture_btn_Click"
+                        FontSize="20" ToolTip="Capture image"/>
+                <Button x:Name="retry_btn" FontFamily="{StaticResource fontawesome-solid}" Content="{StaticResource fa-undo}" Click="retry_btn_Click"
+                        FontSize="20" ToolTip="Try again" Margin="10,0,0,0" IsEnabled="False"/>
+            </StackPanel>
+            <!-- camera view -->
+            <Grid>
+                <!-- real-time camera preview -->
+                <Grid x:Name="cameraContainer" Width="450" Height="250" HorizontalAlignment="Stretch">
+                    <WindowsFormsHost x:Name="cameraHost">
+                        <aforge:VideoSourcePlayer x:Name="videoSourcePlayer" NewFrame="videoSourcePlayer_NewFrame"/>
+                    </WindowsFormsHost>
+                </Grid>
+                <!-- snapshot -->
+                <Grid x:Name="snapshotContainer" Width="450" Height="250" HorizontalAlignment="Stretch" Visibility="Collapsed">
+                    <Image Source="{Binding CapturedImage,RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"/>
+                </Grid>
+            </Grid>
+            <!-- confirm buttons -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                <Button Content="Select" Click="Select_btn_Click" Background="LightGreen" Margin="0,0,8,0"/>
+                <Button Content="Close" Click="Close_btn_Click" Background="Salmon"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

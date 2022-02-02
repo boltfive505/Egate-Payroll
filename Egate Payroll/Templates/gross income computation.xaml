@@ -1,0 +1,268 @@
+﻿<UserControl x:Class="Egate_Payroll.Templates.gross_income_computation"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Egate_Payroll.Templates"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="White" Margin="10">
+        <StackPanel Orientation="Vertical">
+            <!-- title -->
+            <TextBlock IsHitTestVisible="False">
+                <Run Text="{Binding Summary.EmployeeName}" FontWeight="Bold"/>
+                <Run Text="for the period"/>
+                <Run Text="{Binding CurrentPeriod.StartDate,StringFormat=yyyy-MM-dd}" Foreground="red"/>
+                <Run Text="-"/>
+                <Run Text="{Binding CurrentPeriod.EndDate,StringFormat=yyyy-MM-dd}" Foreground="purple"/>
+            </TextBlock>
+            <StackPanel Orientation="Vertical" DataContext="{Binding Summary}">
+                <!-- show figures to be used -->
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <!-- final rh -->
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Final Regular Hours:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding FinalRegularHours,Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" 
+                                           TextAlignment="Right" Foreground="{StaticResource FinalRH.Foreground}"/>
+                        <TextBlock Grid.Column="2" Grid.Row="0" Text=" -> "/>
+                        <TextBlock Grid.Column="4" Grid.Row="0" Text="{Binding FinalRegularHours, Converter={StaticResource TotalHoursConverter}}" 
+                                           TextAlignment="Right" Foreground="{StaticResource FinalRH.Foreground}"
+                                           ToolTip="Final Regular Hours converted to Decimal Format"/>
+                        <!-- final ot -->
+                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Final Overtime:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding FinalOvertime,Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" 
+                                           TextAlignment="Right" Foreground="{StaticResource FinalOT.Foreground}"/>
+                        <TextBlock Grid.Column="2" Grid.Row="1" Text=" -> "/>
+                        <TextBlock Grid.Column="4" Grid.Row="1" Text="{Binding FinalOvertime, Converter={StaticResource TotalHoursConverter}, StringFormat={}({0:N2} x 1.25)}" 
+                                           TextAlignment="Right" Foreground="{StaticResource FinalOT.Foreground}"
+                                           ToolTip="Final Overtime converted to Decimal Format. Also apply the 125%"/>
+                        <!-- holiday hours -->
+                        <TextBlock Grid.Column="0" Grid.Row="2" Text="Total Holiday Hours:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding TotalHolidayTime,Converter={StaticResource TimeSpanTotalHoursDisplayConverter}}" 
+                                           TextAlignment="Right" Foreground="{StaticResource HolidayHours.Foreground}"/>
+                        <TextBlock Grid.Column="2" Grid.Row="2" Text=" -> "/>
+                        <TextBlock Grid.Column="4" Grid.Row="2" Text="{Binding TotalHolidayTime,Converter={StaticResource TotalHoursConverter}}" 
+                                           TextAlignment="Right" Foreground="{StaticResource HolidayHours.Foreground}"
+                                           ToolTip="Total Holiday Hours converted to Decimal Format"/>
+                        <!-- total hours -->
+                        <TextBlock Grid.Column="3" Grid.Row="2" Text="+" Margin="3,0,0,0"/>
+                        <Separator Grid.Column="4" Grid.Row="3"/>
+                        <TextBlock Grid.Column="0" Grid.Row="4" Text="Total Hours:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="4" Grid.Row="4" Text="{Binding TotalHours,Converter={StaticResource TotalHoursConverter}}" 
+                                           TextAlignment="Right" FontWeight="Bold" Foreground="{StaticResource TotalTime.Foreground}"/>
+                    </Grid>
+                    <Grid Margin="50,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <!-- monthly rate (for reference) -->
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Monthly Rate:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding MonthlyRate, StringFormat={}₱ {0:N2}}" TextAlignment="Right"/>
+                        <!-- hourly rate (use for calculation) -->
+                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Hourly Rate:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding HourlyRate, StringFormat={}₱ {0:N2}}" TextAlignment="Right"/>
+                        <!-- allowance rate (use for calculation) -->
+                        <TextBlock Grid.Column="0" Grid.Row="2" Text="Allowance Rate:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding AllowanceRate, StringFormat={}₱ {0:N2}}" TextAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="0,30,0,0">
+                    <!-- gross income -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <!-- total hours -->
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Total Hours:" Foreground="Gray" Margin="0,0,5,0"/>
+                        <TextBlock Grid.Column="2" Grid.Row="0" Text="{Binding TotalHours, Converter={StaticResource TotalHoursConverter}}" 
+                                   TextAlignment="Right" Foreground="{StaticResource TotalTime.Foreground}"/>
+                        <!-- hourly rate -->
+                        <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding HourlyRate, StringFormat={}₱ {0:N2}}" 
+                                    TextAlignment="Right" Foreground="{StaticResource HourlyRate.Foreground}"/>
+                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Hourly Rate:" Foreground="Gray" Margin="0,0,5,0"/>
+                        <!-- gross income -->
+                        <TextBlock Grid.Column="0" Grid.Row="3" Text="Gross Income:" Foreground="Gray" Margin="0,0,5,0"/>
+                        <TextBlock Grid.Column="1" Grid.Row="1" Text="x" Margin="0,0,3,0"/>
+                        <Separator Grid.Column="2" Grid.Row="2"/>
+                        <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding GrossIncome, StringFormat={}₱ {0:N2}}" 
+                                           TextAlignment="Right" FontWeight="Bold" Foreground="{StaticResource GrossIncome.Foreground}"/>
+                    </Grid>
+                    <!-- allowance income -->
+                    <Grid Margin="30,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <!-- work total -->
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Regular Hours:" Foreground="Gray" Margin="0,0,5,0"/>
+                        <TextBlock Grid.Column="2" Grid.Row="0" Text="{Binding FinalRegularHours, Converter={StaticResource TotalHoursConverter}}" 
+                                    TextAlignment="Right" Foreground="{StaticResource TotalTime.Foreground}"/>
+                        <!-- allowance rate -->
+                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Allowance Rate:" Foreground="Gray" Margin="0,0,5,0"/>
+                        <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding AllowanceRate, StringFormat={}₱ {0:N2}}" 
+                                TextAlignment="Right" Foreground="{StaticResource HourlyRate.Foreground}"/>
+                        <!-- allowance income -->
+                        <TextBlock Grid.Column="1" Grid.Row="1" Text="x" Margin="0,0,3,0"/>
+                        <Separator Grid.Column="2" Grid.Row="2"/>
+                        <TextBlock Grid.Column="0" Grid.Row="3" Text="Allowance Income:" Foreground="Gray" Margin="0,0,5,0"/>
+                        <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding GrandTotalAllowance, StringFormat={}₱ {0:N2}}" 
+                                TextAlignment="Right" FontWeight="Bold" Foreground="{StaticResource GrossIncome.Foreground}"/>
+
+                    </Grid>
+                    <!-- net income -->
+                    <Grid Margin="30,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <!-- gross income -->
+                        <TextBlock Grid.Column="0" Grid.Row="0" Text="Gross Income:" Foreground="Gray" Margin="0,0,5,0"/>
+                        <TextBlock Grid.Column="2" Grid.Row="0" Text="{Binding GrossIncome, StringFormat={}₱ {0:N2}}" 
+                                    TextAlignment="Right" Foreground="DarkGreen" ToolTip="Total Hours"/>
+                        <!-- allocance income -->
+                        <TextBlock Grid.Column="0" Grid.Row="1" Text="Allowance Income:" Foreground="Gray" Margin="0,0,5,0"/>
+                        <TextBlock Grid.Column="2" Grid.Row="1" Text="{Binding GrandTotalAllowance, StringFormat={}₱ {0:N2}}" 
+                                    TextAlignment="Right" Foreground="DarkGreen"/>
+                        <!-- adjustment amount -->
+                        <TextBlock Grid.Column="0" Grid.Row="2" Text="Adjustment Amount:" Foreground="Gray" Margin="0,0,5,0"/>
+                        <TextBlock Grid.Column="2" Grid.Row="2" Text="{Binding AdjustmentAmount, StringFormat={}₱ {0:N2}}" 
+                                    TextAlignment="Right"/>
+                        <!-- deductions -->
+                        <TextBlock Grid.Column="0" Grid.Row="3" Text="Deductions:" Foreground="Gray" Margin="0,0,5,0"/>
+                        <TextBlock Grid.Column="2" Grid.Row="3" Text="{Binding Deductions.TotalEmployeeDeductions, StringFormat={}₱ -{0:N2}}" 
+                                    TextAlignment="Right" Foreground="Red"/>
+                        <!-- net income -->
+                        <TextBlock Grid.Column="1" Grid.Row="3" Text="+" Margin="0,0,3,0"/>
+                        <Separator Grid.Column="2" Grid.Row="4"/>
+                        <TextBlock Grid.Column="0" Grid.Row="5" Text="Net Income:" Foreground="Gray" Margin="0,0,5,0"/>
+                        <TextBlock Grid.Column="2" Grid.Row="5" Text="{Binding NetPay, StringFormat={}₱ {0:N2}}" 
+                                           TextAlignment="Right" FontWeight="Bold" Foreground="{StaticResource GrossIncome.Foreground}"/>
+                    </Grid>
+                </StackPanel>
+                <!-- deductions (for reference only, not included in computation) -->
+                <StackPanel Orientation="Horizontal" Margin="0,20,0,0" DataContext="{Binding Deductions}">
+                    <!-- employee contribution -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Text="Employee Contribution" FontWeight="bold" HorizontalAlignment="Left"/>
+                        <!-- sss -->
+                        <TextBlock Grid.Column="0" Grid.Row="1" Text="SSS:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding SssEmployeeContribution,StringFormat={}₱ {0:N2}}" 
+                                   Foreground="{StaticResource SSS.Background}" TextAlignment="Right"/>
+                        <!-- philhealth -->
+                        <TextBlock Grid.Column="0" Grid.Row="2" Text="PhilHealth:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding PhilhealthEmployeeContribution,StringFormat={}₱ {0:N2}}" 
+                                   Foreground="{StaticResource PhilHealth.Background}" TextAlignment="Right"/>
+                        <!-- pagibig -->
+                        <TextBlock Grid.Column="0" Grid.Row="3" Text="Pag-Ibig:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding PagibigEmployeeContribution,StringFormat={}₱ {0:N2}}" 
+                                   Foreground="{StaticResource Pagibig.Background}" TextAlignment="Right"/>
+                        <!-- tax -->
+                        <TextBlock Grid.Column="0" Grid.Row="4" Text="Tax:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="4" Text="{Binding TaxEmployeeContribution,StringFormat={}₱ {0:N2}}" 
+                                   Foreground="{StaticResource BIR.Background}" TextAlignment="Right"/>
+                        <!-- total -->
+                        <Separator Grid.Column="1" Grid.Row="5"/>
+                        <TextBlock Grid.Column="0" Grid.Row="6" Text="Total:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding TotalEmployeeDeductions,StringFormat={}₱ {0:N2}}" 
+                                   Foreground="Red" FontWeight="Bold" TextAlignment="Right"/>
+                    </Grid>
+                    <!-- employer contribution -->
+                    <Grid Margin="20,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Text="Employer Contribution" FontWeight="bold" HorizontalAlignment="Left"/>
+                        <!-- sss -->
+                        <TextBlock Grid.Column="0" Grid.Row="1" Text="SSS:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding SssEmployerContribution,StringFormat={}₱ {0:N2}}" 
+                                   Foreground="{StaticResource SSS.Background}" TextAlignment="Right"/>
+                        <!-- philhealth -->
+                        <TextBlock Grid.Column="0" Grid.Row="2" Text="PhilHealth:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="2" Text="{Binding PhilhealthEmployerContribution,StringFormat={}₱ {0:N2}}" 
+                                   Foreground="{StaticResource PhilHealth.Background}" TextAlignment="Right"/>
+                        <!-- pagibig -->
+                        <TextBlock Grid.Column="0" Grid.Row="3" Text="Pag-Ibig:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="3" Text="{Binding PagibigEmployerContribution,StringFormat={}₱ {0:N2}}" 
+                                   Foreground="{StaticResource Pagibig.Background}" TextAlignment="Right"/>
+                        <!-- tax -->
+                        <TextBlock Grid.Column="0" Grid.Row="4" Text="Tax:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="4" Text="N/A" 
+                                   Foreground="{StaticResource BIR.Background}" TextAlignment="Right"/>
+                        <!-- total -->
+                        <Separator Grid.Column="1" Grid.Row="5"/>
+                        <TextBlock Grid.Column="0" Grid.Row="6" Text="Total:  " Foreground="Gray"/>
+                        <TextBlock Grid.Column="1" Grid.Row="6" Text="{Binding TotalEmployerDeductions,StringFormat={}₱ {0:N2}}" 
+                                   Foreground="Red" FontWeight="Bold" TextAlignment="Right"/>
+                    </Grid>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

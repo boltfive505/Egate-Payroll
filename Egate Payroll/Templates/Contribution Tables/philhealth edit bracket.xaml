@@ -1,0 +1,82 @@
+﻿<UserControl x:Class="Egate_Payroll.Templates.Contribution_Tables.philhealth_edit_bracket"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Egate_Payroll.Templates.Contribution_Tables"
+             xmlns:extTool="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+             xmlns:converters="clr-namespace:Egate_Payroll.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:NumberOperationConverter x:Key="NumberFrom" Operation="Add" OperatorValue="0.01"/>
+        <converters:NumberOperationConverter x:Key="NumberTo" Operation="Subtract" OperatorValue="0.01"/>
+        <converters:MultiValueNumberOperationConverter x:Key="MultiplyPremiumPay" Operation="Multiply"/>
+    </UserControl.Resources>
+    <Grid Background="White">
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="{StaticResource EditBracket.Group.Margin}">
+            <!-- monthly basic salary -->
+            <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}">
+                <TextBlock Text="Monthly Basic Salary" HorizontalAlignment="Center"/>
+                <extTool:DecimalUpDown x:Name="MonthlyBasicSalaryFromValue" ShowButtonSpinner="False" FormatString="N2" Value="{Binding MonthlyBasicSalaryFrom,UpdateSourceTrigger=Explicit}"/>
+                <TextBlock HorizontalAlignment="Center" Margin="{StaticResource DataGridTextCell.Margin}">
+                    <Run Text="{Binding ElementName=MonthlyBasicSalaryFromValue, Path=Value, Mode=OneWay, Converter={StaticResource NumberFrom}, StringFormat=N2}"/>
+                    <Run Text="to"/>
+                    <Run Text="{Binding ElementName=MonthlyBasicSalaryToValue, Path=Value,Mode=OneWay, Converter={StaticResource NumberTo}, StringFormat=N2}"/>
+                </TextBlock>
+                <extTool:DecimalUpDown x:Name="MonthlyBasicSalaryToValue" FormatString="N2" ShowButtonSpinner="False" Value="{Binding MonthlyBasicSalaryTo,UpdateSourceTrigger=Explicit}"/>
+            </StackPanel>
+            <!-- premium rate -->
+            <Grid VerticalAlignment="Center" Margin="{StaticResource EditBracket.Fields.Margin}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Premium Rate" Grid.ColumnSpan="2"/>
+                <extTool:DecimalUpDown Grid.Row="1" x:Name="PremiumRateValue" FormatString="N2" ShowButtonSpinner="False"
+                                       Value="{Binding PremiumRate,UpdateSourceTrigger=Explicit, Converter={StaticResource PercentConverter}}"/>
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="%" VerticalAlignment="Center" Margin="3,0,0,0"/>
+            </Grid>
+            <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}">
+                <TextBlock Text=" Monthly Premium"/>
+                <TextBlock HorizontalAlignment="Center" Margin="{StaticResource DataGridTextCell.Margin}">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource MultiplyPremiumPay}" StringFormat="N0">
+                            <Binding ElementName="MonthlyBasicSalaryFromValue" Path="Value"/>
+                            <Binding ElementName="PremiumRateValue" Path="Value"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+                <Border Height="1" BorderThickness="1" BorderBrush="DarkGray"/>
+                <TextBlock HorizontalAlignment="Center" Margin="{StaticResource DataGridTextCell.Margin}">
+                    <Run>
+                        <MultiBinding Converter="{StaticResource MultiplyPremiumPay}" StringFormat="N2">
+                            <Binding ElementName="MonthlyBasicSalaryFromValue" Path="Value"/>
+                            <Binding ElementName="PremiumRateValue" Path="Value"/>
+                        </MultiBinding>
+                    </Run>
+                    <Run Text="to"/>
+                    <Run>
+                        <MultiBinding Converter="{StaticResource MultiplyPremiumPay}" StringFormat="N2">
+                            <Binding ElementName="MonthlyBasicSalaryToValue" Path="Value"/>
+                            <Binding ElementName="PremiumRateValue" Path="Value"/>
+                        </MultiBinding>
+                    </Run>
+                </TextBlock>
+                <Border Height="1" BorderThickness="1" BorderBrush="DarkGray"/>
+                <TextBlock HorizontalAlignment="Center" Margin="{StaticResource DataGridTextCell.Margin}">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource MultiplyPremiumPay}" StringFormat="N0">
+                            <Binding ElementName="MonthlyBasicSalaryToValue" Path="Value"/>
+                            <Binding ElementName="PremiumRateValue" Path="Value"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

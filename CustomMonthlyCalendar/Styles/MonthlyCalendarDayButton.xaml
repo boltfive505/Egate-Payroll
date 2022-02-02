@@ -1,0 +1,67 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:CustomMonthlyCalendar">
+    <Style TargetType="{x:Type local:MonthlyCalendarDayButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:MonthlyCalendarDayButton}">
+                    <Grid>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Button x:Name="PART_DayTitleButton" Cursor="Hand" HorizontalContentAlignment="Left">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding Day, RelativeSource={RelativeSource TemplatedParent}, StringFormat=%d}" 
+                                               Padding="5,1,5,1" TextAlignment="Left" FontSize="11"/>
+                                        <ContentPresenter Grid.Column="1" Content="{Binding TitleExtraContent, RelativeSource={RelativeSource TemplatedParent}}"/>
+                                    </Grid>
+                                    <Button.Style>
+                                        <Style TargetType="{x:Type Button}">
+                                            <Setter Property="Background" Value="#94b8d7"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsDisplayedMonth, RelativeSource={RelativeSource TemplatedParent}}" Value="False">
+                                                    <Setter Property="Background" Value="Gray"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsToday, RelativeSource={RelativeSource TemplatedParent}}" Value="True">
+                                                    <Setter Property="Background" Value="Orange"/>
+                                                </DataTrigger>
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding IsDisplayedMonth, RelativeSource={RelativeSource TemplatedParent}}" Value="False"/>
+                                                        <Condition Binding="{Binding IsToday, RelativeSource={RelativeSource TemplatedParent}}" Value="True"/>
+                                                    </MultiDataTrigger.Conditions>
+                                                    <Setter Property="Background" Value="DarkOrange"/>
+                                                </MultiDataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <Grid.Style>
+                                    <Style TargetType="{x:Type Grid}">
+                                        <Setter Property="Background" Value="White"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsDisplayedMonth, RelativeSource={RelativeSource TemplatedParent}}" Value="False">
+                                                <Setter Property="Background" Value="LightGray"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <ContentPresenter Content="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" DataContext="{Binding DataContext, RelativeSource={RelativeSource TemplatedParent}}"/>
+                            </Grid>
+                        </Grid>
+                        <Border BorderBrush="SkyBlue" BorderThickness="0.5" SnapsToDevicePixels="True"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

@@ -1,0 +1,61 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:CustomControls.Modal"
+                    xmlns:primitives="clr-namespace:CustomControls.Modal.Primitive">
+    <Style TargetType="{x:Type local:ModalForm}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:ModalForm}">
+                    <Grid x:Name="PART_ModalContainer">
+                        <Grid.Background>
+                            <SolidColorBrush Color="Black" Opacity="0.25"/>
+                        </Grid.Background>
+                        <!-- modal items will be added here, can be multiple -->
+                    </Grid>
+
+                    <ControlTemplate.Resources>
+                        <DataTemplate x:Key="Ok" DataType="{x:Type primitives:ModalItem}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <primitives:ModalButton Content="OK" ResultParameter="Ok" Background="#2b64ff"
+                                   ResultCommand="{Binding ResultCommand, RelativeSource={RelativeSource AncestorType={x:Type primitives:ModalItem}}}"/>
+                            </StackPanel>
+                        </DataTemplate>
+
+                        <DataTemplate x:Key="YesNo" DataType="{x:Type primitives:ModalItem}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <primitives:ModalButton Content="NO" ResultParameter="No" Background="#ff2b2b"
+                                   ResultCommand="{Binding ResultCommand, RelativeSource={RelativeSource AncestorType={x:Type primitives:ModalItem}}}"/>
+                                <primitives:ModalButton Content="YES" ResultParameter="Yes" Background="#00ab30"
+                                   ResultCommand="{Binding ResultCommand, RelativeSource={RelativeSource AncestorType={x:Type primitives:ModalItem}}}"/>
+                            </StackPanel>
+                        </DataTemplate>
+
+                        <DataTemplate x:Key="SaveCancel" DataType="{x:Type primitives:ModalItem}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <primitives:ModalButton Content="CANCEL" ResultParameter="Cancel" Background="#ff2b2b"
+                                   ResultCommand="{Binding ResultCommand, RelativeSource={RelativeSource AncestorType={x:Type primitives:ModalItem}}}"/>
+                                <primitives:ModalButton Content="SAVE" ResultParameter="Save" Background="#2b64ff"
+                                   ResultCommand="{Binding ResultCommand, RelativeSource={RelativeSource AncestorType={x:Type primitives:ModalItem}}}"/>
+                            </StackPanel>
+                        </DataTemplate>
+
+                        <DataTemplate x:Key="SaveCancelDelete" DataType="{x:Type primitives:ModalItem}">
+                            <Grid>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                    <primitives:ModalButton Content="DELETE" ResultParameter="Delete" Background="Red"
+                                   ResultCommand="{Binding ResultCommand, RelativeSource={RelativeSource AncestorType={x:Type primitives:ModalItem}}}"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <primitives:ModalButton Content="CANCEL" ResultParameter="Cancel" Background="#ff2b2b"
+                                   ResultCommand="{Binding ResultCommand, RelativeSource={RelativeSource AncestorType={x:Type primitives:ModalItem}}}"/>
+                                    <primitives:ModalButton Content="SAVE" ResultParameter="Save" Background="#2b64ff"
+                                   ResultCommand="{Binding ResultCommand, RelativeSource={RelativeSource AncestorType={x:Type primitives:ModalItem}}}"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ControlTemplate.Resources>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

@@ -1,0 +1,188 @@
+﻿<UserControl x:Class="Egate_Payroll.Templates.add_tax_filing_period"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:me="clr-namespace:Egate_Payroll"
+             xmlns:local="clr-namespace:Egate_Payroll.Templates"
+             xmlns:extTool="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="White">
+        <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Group.Margin}"
+                    VerticalAlignment="Top" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource EditBracket.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}">
+                    <TextBlock Text="Form Name"/>
+                    <TextBox x:Name="FormNameValue" Text="{Binding FormName, Mode=TwoWay,UpdateSourceTrigger=Explicit}" Width="150"/>
+                </StackPanel>
+                <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}">
+                    <TextBlock Text="Category"/>
+                    <ComboBox x:Name="FilingCategoryValue" Width="150"
+                              SelectedValue="{Binding CategoryId}"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource EditBracket.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}">
+                    <TextBlock Text="Period Type"/>
+                    <ComboBox x:Name="PeriodTypeValue" SelectedItem="{Binding PeriodType, Mode=TwoWay,UpdateSourceTrigger=Explicit}" Width="120">
+                    </ComboBox>
+                </StackPanel>
+                <!-- start one time period -->
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="{x:Type StackPanel}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=PeriodTypeValue, Path=SelectedItem}" Value="{x:Static me:FilingPeriodType.OneTime}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}">
+                        <TextBlock Text="Due Date"/>
+                        <extTool:DateTimePicker x:Name="DueDateStartValue" Value="{Binding DueDateStart,Mode=TwoWay,UpdateSourceTrigger=Explicit}"
+                                                TimePickerVisibility="Collapsed" 
+                                                Format="Custom" FormatString="MM/dd/yyyy" 
+                                                ShowButtonSpinner="False" Width="120"/>
+                    </StackPanel>
+                </StackPanel>
+                <!-- end one time period -->
+                <!-- start monthly period -->
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="{x:Type StackPanel}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=PeriodTypeValue, Path=SelectedItem}" Value="{x:Static me:FilingPeriodType.Monthly}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}">
+                        <TextBlock Text="Day"/>
+                        <ComboBox x:Name="DueDaysValue" SelectedItem="{Binding DueDays,Mode=TwoWay,UpdateSourceTrigger=Explicit}"
+                                  Width="60" ItemStringFormat="{}{0:00}">
+                        </ComboBox>
+                        <!--<TextBlock Text="After every X days"/>
+                        <extTool:IntegerUpDown x:Name="DueDaysValue" Value="{Binding DueDays,Mode=TwoWay,UpdateSourceTrigger=Explicit}"
+                                               ShowButtonSpinner="False"/>-->
+                    </StackPanel>
+                    <!-- include months checkbox list -->
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}">
+                        <TextBlock Text="Include Months"/>
+                        <ListBox x:Name="MonthInclusionListValue" ItemsSource="{Binding MonthInclusionList}">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Vertical" Width="190" Height="155"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsIncluded, Mode=TwoWay,UpdateSourceTrigger=Explicit}" Content="{Binding Value, Converter={StaticResource MonthNameConverter}}"
+                                          Margin="0,3,15,3"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </StackPanel>
+                <!-- end monthly period -->
+                <!-- start end of quarter period -->
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="{x:Type StackPanel}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=PeriodTypeValue, Path=SelectedItem}" Value="{x:Static me:FilingPeriodType.EndOfQuarter}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}">
+                        <TextBlock Text="After every X days"/>
+                        <extTool:IntegerUpDown x:Name="DueDaysValue3" Value="{Binding DueDays,Mode=TwoWay,UpdateSourceTrigger=Explicit}"
+                                               ShowButtonSpinner="False"/>
+                    </StackPanel>
+                    <!-- include quarter checkbox list -->
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}">
+                        <TextBlock Text="Include Quarter"/>
+                        <ListBox x:Name="QuarterInclusionListValue" ItemsSource="{Binding QuarterInclusionList}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsIncluded}" Margin="0,3,15,3">
+                                        <CheckBox.Content>
+                                            <TextBlock>
+                                            <Run Text="{Binding Value,Mode=TwoWay,UpdateSourceTrigger=Explicit, Converter={StaticResource OrdinalStringConverter}}"/>
+                                            <Run Text="Quarter"/>
+                                            </TextBlock>
+                                        </CheckBox.Content>
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </StackPanel>
+                <!-- end end of quarter period -->
+                <!-- start annual period -->
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="{x:Type StackPanel}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=PeriodTypeValue, Path=SelectedItem}" Value="{x:Static me:FilingPeriodType.Annually}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}">
+                        <TextBlock Text="Month"/>
+                        <ComboBox x:Name="DueMonthValue" SelectedValue="{Binding DueMonth,Mode=TwoWay,UpdateSourceTrigger=Explicit}"
+                                  Width="130">
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}">
+                        <TextBlock Text="Day"/>
+                        <ComboBox x:Name="DueDaysValue2" SelectedItem="{Binding DueDays,Mode=TwoWay,UpdateSourceTrigger=Explicit}"
+                                  Width="60" ItemStringFormat="{}{0:00}">
+                        </ComboBox>
+                    </StackPanel>
+                </StackPanel>
+                <!-- end annual period -->
+            </StackPanel>
+            <!-- form title -->
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource EditBracket.Verticals.Margin}" HorizontalAlignment="Stretch">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}" Width="450">
+                    <TextBlock Text="Form Title"/>
+                    <TextBox x:Name="FormTitleValue" Text="{Binding FormTitle, Mode=TwoWay,UpdateSourceTrigger=Explicit}" HorizontalAlignment="Stretch"/>
+                </StackPanel>
+            </StackPanel>
+            <!-- description -->
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource EditBracket.Verticals.Margin}">
+                <StackPanel Orientation="Vertical" Margin="{StaticResource EditBracket.Fields.Margin}">
+                    <TextBlock Text="Hover Text (Description)"/>
+                    <TextBox x:Name="DescriptionValue" Text="{Binding Description, Mode=TwoWay,UpdateSourceTrigger=Explicit}" 
+                             TextWrapping="Wrap" Width="450" Height="50"/>
+                </StackPanel>
+            </StackPanel>
+            <!-- is active, only shows if editing (when Id != -1) -->
+            <StackPanel Orientation="Horizontal" Margin="{StaticResource EditBracket.Verticals.Margin}" HorizontalAlignment="Right">
+                <StackPanel.Style>
+                    <Style TargetType="{x:Type StackPanel}">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Id}" Value="-1">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <CheckBox x:Name="IsActiveValue" IsChecked="{Binding IsActive, Mode=TwoWay,UpdateSourceTrigger=Explicit}"
+                          Content="Is Active" Margin="{StaticResource EditBracket.Fields.Margin}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>
